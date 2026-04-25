@@ -1,0 +1,32 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-21T09:22:40Z",
+  "final_score": 73,
+  "audio_score": 90,
+  "expression_score": 81,
+  "nlp_score": 26,
+  "audio_metrics": {
+    "word_count": 4,
+    "wpm": 48.0,
+    "filler_count": 0,
+    "energy": 0.000541,
+    "avg_pitch": 149.89,
+    "pitch_variation": 46.18,
+    "duration": 5.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.382,
+    "smile_variance": 0.00114,
+    "avg_movement": 0.00412,
+    "emotion_stability": 0.818
+  },
+  "nlp_metrics": {
+    "Filler Words": 0,
+    "Keyword Matches": 0,
+    "Sentiment Score": 50,
+    "Clarity Score": 40
+  },
+  "transcript": "updated on and online",
+  "feedback": "Strong performance with minor improvements needed. Work on reducing filler words and improving expressiveness."
+}

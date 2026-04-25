@@ -1,0 +1,25 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-21T08:55:57Z",
+  "error": "Audio error: Unable to allocate 3.26 TiB for an array with shape (1793921920000, 1) and data type int16",
+  "final_score": 44,
+  "audio_score": 0,
+  "expression_score": 100,
+  "nlp_score": 20,
+  "audio_metrics": {},
+  "expression_metrics": {
+    "avg_smile": 0.367,
+    "smile_variance": 6e-05,
+    "avg_movement": 0.00378,
+    "emotion_stability": 0.595
+  },
+  "nlp_metrics": {
+    "Filler Words": 0,
+    "Keyword Matches": 0,
+    "Sentiment Score": 50,
+    "Clarity Score": 0
+  },
+  "transcript": "",
+  "feedback": "Significant improvement required. Practice structured responses, vocal confidence, and facial engagement."
+}

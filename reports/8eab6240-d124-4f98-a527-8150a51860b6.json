@@ -1,0 +1,32 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-21T09:27:11Z",
+  "final_score": 81,
+  "audio_score": 100,
+  "expression_score": 87,
+  "nlp_score": 33,
+  "audio_metrics": {
+    "word_count": 70,
+    "wpm": 116.67,
+    "filler_count": 0,
+    "energy": 0.001069,
+    "avg_pitch": 146.31,
+    "pitch_variation": 45.85,
+    "duration": 36.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.382,
+    "smile_variance": 0.00038,
+    "avg_movement": 0.00624,
+    "emotion_stability": 0.61
+  },
+  "nlp_metrics": {
+    "Filler Words": 1,
+    "Keyword Matches": 0,
+    "Sentiment Score": 55,
+    "Clarity Score": 90
+  },
+  "transcript": "hello my name is of events that and i study in medica funny was currently i'm passing that we take education encumbered as name's i'm just going he was lucky go out to upgrade my graduation about ninety seven and now i'm really grateful for to this university but allowing me to fill my skills i know but i'm ready bentley i try very hard to succeed in my ankle",
+  "feedback": "Strong performance with minor improvements needed. Work on reducing filler words and improving expressiveness."
+}
