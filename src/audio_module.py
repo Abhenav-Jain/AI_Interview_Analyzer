@@ -8,210 +8,167 @@ import numpy as np
 import soundfile as sf
 import librosa
 import sounddevice as sd
-import soundfile as sf
 
 from vosk import Model, KaldiRecognizer
 
-
-# =====================================================
-# PATH SETUP
-# =====================================================
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+# ── Path setup ───────────────────────────────────────────────
+BASE_DIR   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 AUDIO_PATH = os.path.join(BASE_DIR, "data", "audio", "interview.wav")
 MODEL_PATH = os.path.join(BASE_DIR, "models", "vosk-model-small-en-us-0.15")
 
 os.makedirs(os.path.dirname(AUDIO_PATH), exist_ok=True)
 
 FILLER_WORDS = ["uh", "um", "like", "you know", "actually", "basically", "so"]
+CONFIDENT_WORDS = ["led", "built", "developed", "achieved", "implemented",
+                   "designed", "managed", "created", "improved", "delivered"]
+
+# ── Load model safely ─────────────────────────────────────────
+print("Loading Vosk model...")
+try:
+    _model = Model(MODEL_PATH)
+    print("✅ Vosk model loaded")
+except Exception as e:
+    print("❌ Vosk model load failed:", e)
+    _model = None
 
 
-# =====================================================
-# LOAD MODEL ONLY ONCE
-# =====================================================
-
-print("Loading Vosk model once...")
-model = Model(MODEL_PATH)
-
-
-# =====================================================
-# RECORD AUDIO (MEMORY SAFE)
-# =====================================================
-
-def record_audio(duration=10):
-
+# ── Record audio safely ───────────────────────────────────────
+def record_audio(duration: int = 25):
     RATE = 16000
-
-    print("\n🎙 Recording audio... Speak clearly")
-
-    audio_data = sd.rec(
-        int(duration * RATE),
-        samplerate=RATE,
-        channels=1,
-        dtype="int16"
-    )
-
-    sd.wait()
-
-    sf.write(AUDIO_PATH, audio_data, RATE)
-
-    print("✅ Audio saved:", AUDIO_PATH)
+    try:
+        print(f"\n🎙 Recording for {duration}s...")
+        audio_data = sd.rec(int(duration * RATE), samplerate=RATE, channels=1, dtype="int16")
+        sd.wait()
+        sf.write(AUDIO_PATH, audio_data, RATE)
+        print("✅ Audio saved")
+    except Exception as e:
+        print("❌ Recording error:", e)
+        raise
 
 
-# =====================================================
-# SPEECH RECOGNITION
-# =====================================================
-
+# ── Speech-to-text ───────────────────────────────────────────
 def speech_to_text():
+    if _model is None:
+        return ""
 
-    print("Starting speech recognition...")
+    try:
+        wf = wave.open(AUDIO_PATH, "rb")
+        recognizer = KaldiRecognizer(_model, wf.getframerate())
 
-    wf = wave.open(AUDIO_PATH, "rb")
+        transcript = ""
 
-    recognizer = KaldiRecognizer(model, wf.getframerate())
+        while True:
+            data = wf.readframes(4000)
+            if not data:
+                break
+            if recognizer.AcceptWaveform(data):
+                transcript += json.loads(recognizer.Result()).get("text", "") + " "
 
-    transcript = ""
+        transcript += json.loads(recognizer.FinalResult()).get("text", "")
+        wf.close()
 
-    while True:
+        return transcript.strip()
 
-        data = wf.readframes(2000)
-
-        if len(data) == 0:
-            break
-
-        if recognizer.AcceptWaveform(data):
-
-            result = json.loads(recognizer.Result())
-            transcript += result.get("text", "") + " "
-
-    final = json.loads(recognizer.FinalResult())
-    transcript += final.get("text", "")
-
-    wf.close()
-
-    return transcript.strip()
+    except Exception as e:
+        print("❌ Speech error:", e)
+        return ""
 
 
-# =====================================================
-# FILLER COUNT
-# =====================================================
-
+# ── Utility functions ─────────────────────────────────────────
 def count_fillers(text):
-
     text = text.lower()
-
-    count = 0
-
-    for word in FILLER_WORDS:
-        count += len(re.findall(rf"\b{re.escape(word)}\b", text))
-
-    return count
+    return sum(len(re.findall(rf"\b{re.escape(w)}\b", text)) for w in FILLER_WORDS)
 
 
-# =====================================================
-# AUDIO ANALYSIS
-# =====================================================
+def count_confident_words(text):
+    text = text.lower()
+    return sum(len(re.findall(rf"\b{re.escape(w)}\b", text)) for w in CONFIDENT_WORDS)
 
-def run_audio_analysis(duration=25):
 
-    # 1️⃣ Record
+def silence_ratio(y):
+    rms = librosa.feature.rms(y=y)[0]
+    return float(np.mean(rms < 0.01))
+
+
+# ── MAIN FUNCTION ─────────────────────────────────────────────
+def run_audio_analysis(duration: int = 25):
+
     record_audio(duration)
+    transcript = speech_to_text()
 
-    # 2️⃣ Speech recognition
-    text = speech_to_text()
+    if not transcript:
+        print("⚠ No speech detected")
 
-    print("\n📝 ===== TRANSCRIPT =====")
-    print(text)
+    print(f"\n📝 Transcript: {transcript[:100]}...")
 
-    # 3️⃣ Load audio
-    y, sr_rate = sf.read(AUDIO_PATH)
-
-    if len(y.shape) > 1:
+    y, sr = sf.read(AUDIO_PATH)
+    if y.ndim > 1:
         y = y.mean(axis=1)
 
-    duration = len(y) / sr_rate
+    actual_duration = len(y) / sr
 
-    # 4️⃣ Word metrics
-    word_count = len(text.split())
+    words = transcript.split()
+    word_count = len(words)
+    wpm = word_count / (actual_duration / 60) if actual_duration > 0 else 0
 
-    if duration > 0:
-        wpm = word_count / (duration / 60)
-    else:
-        wpm = 0
+    filler_count = count_fillers(transcript)
+    confident_count = count_confident_words(transcript)
+    silence = silence_ratio(y)
 
-    filler_count = count_fillers(text)
+    energy = float(np.mean(y ** 2))
 
-    # 5️⃣ Energy
-    energy = float(np.mean(np.square(y)))
-
-    # 6️⃣ Pitch
     try:
-
-        f0 = librosa.yin(y.astype(float), fmin=80, fmax=300, sr=sr_rate)
-        f0 = f0[~np.isnan(f0)]
-
-        avg_pitch = np.mean(f0) if len(f0) > 0 else 0
-        pitch_variation = np.std(f0) if len(f0) > 0 else 0
-
+        f0 = librosa.yin(y, fmin=80, fmax=300, sr=sr)
+        f0_clean = f0[~np.isnan(f0)]
+        pitch_var = float(np.std(f0_clean)) if len(f0_clean) else 0
     except:
+        pitch_var = 0
 
-        avg_pitch = 0
-        pitch_variation = 0
+    # ── SCORING ───────────────────────────────────────────────
+    score = 0
 
-    # =====================================================
-    # CONFIDENCE SCORE
-    # =====================================================
+    # Speaking pace
+    if 110 <= wpm <= 160:
+        score += 25
+    elif 90 <= wpm <= 180:
+        score += 15
+    else:
+        score += 5
 
-    confidence = 100
+    # Energy
+    if energy > 0.005:
+        score += 20
+    elif energy > 0.001:
+        score += 10
+
+    # Fillers
+    score += max(0, 20 - filler_count * 3)
+
+    # Pitch variation
+    score += min(15, pitch_var / 3)
+
+    # Silence
+    score += max(0, 10 - silence * 20)
+
+    # Confidence words
+    score += min(10, confident_count * 2)
 
     if word_count == 0:
-        confidence = 0
+        score = 0
 
-    if filler_count > 3:
-        confidence -= 10
-
-    if wpm < 100 or wpm > 170:
-        confidence -= 10
-
-    if energy < 0.0001:
-        confidence -= 10
-
-    confidence = max(0, min(100, int(confidence)))
-
-    # =====================================================
-    # METRICS
-    # =====================================================
+    score = int(max(0, min(100, score)))
 
     metrics = {
-
         "word_count": word_count,
-        "wpm": round(wpm, 2),
+        "wpm": round(wpm, 1),
         "filler_count": filler_count,
+        "confident_words": confident_count,
+        "silence_ratio": round(silence, 2),
         "energy": round(energy, 6),
-        "avg_pitch": round(avg_pitch, 2),
-        "pitch_variation": round(pitch_variation, 2),
-        "duration": round(duration, 2)
-
+        "pitch_variation": round(pitch_var, 1),
+        "duration": round(actual_duration, 1),
     }
 
-    print("\n📊 ===== AUDIO METRICS =====")
+    print(f"\n🎯 Audio Score: {score}/100")
 
-    for k, v in metrics.items():
-        print(f"{k}: {v}")
-
-    print("\n🎯 Audio Confidence Score:", confidence)
-
-    return confidence, metrics, text
-
-if __name__ == "__main__":
-
-    print("\nRunning standalone audio test...\n")
-
-    score, metrics, text = run_audio_analysis(10)
-
-    print("\nFinal Transcript:", text)
-    print("\nScore:", score)
-    print("\nMetrics:", metrics)
-
-
+    return score, metrics, transcript

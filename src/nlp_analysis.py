@@ -1,96 +1,138 @@
 import re
-from textblob import TextBlob
+import requests
+import os
+import json
+from dotenv import load_dotenv
 
-# Expected technical keywords
-KEYWORDS = [
-    "python",
-    "machine learning",
-    "data",
-    "algorithm",
-    "project",
-    "experience",
-    "model",
-    "analysis"
-]
+load_dotenv()
 
-# Common filler words
-FILLER_WORDS = ["um", "uh", "like", "you know", "basically", "actually"]
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
+MISTRAL_URL = "https://api.mistral.ai/v1/chat/completions"
 
 
-def count_filler_words(text):
-    text = text.lower()
-    count = 0
-
-    for word in FILLER_WORDS:
-        count += text.count(word)
-
-    return count
+def tokenize(text):
+    return re.findall(r'\b\w+\b', text.lower())
 
 
-def keyword_score(text):
-    text = text.lower()
-    score = 0
+def basic_fallback_score(text):
+    words = tokenize(text)
 
-    for word in KEYWORDS:
-        if word in text:
-            score += 1
+    length_score = min(100, len(words) * 2)
 
-    return score
+    filler_penalty = sum(word in ["um", "uh", "like"] for word in words) * 5
+    final = max(0, length_score - filler_penalty)
 
-
-def sentiment_score(text):
-    blob = TextBlob(text)
-    polarity = blob.sentiment.polarity
-
-    score = int((polarity + 1) * 50)
-    return score
+    return final
 
 
-def sentence_clarity(text):
+def call_mistral(answer):
+    if not MISTRAL_API_KEY:
+        print("❌ No API Key found")
+        return None
 
-    sentences = re.split(r'[.!?]', text)
-    sentences = [s for s in sentences if len(s.strip()) > 0]
+    prompt = f"""
+You are an expert interview evaluator.
 
-    if len(sentences) == 0:
-        return 0
+Evaluate the following answer based on:
+- Relevance & depth
+- Communication clarity
+- Technical keyword usage
+- Filler words
 
-    avg_length = sum(len(s.split()) for s in sentences) / len(sentences)
+Return ONLY valid JSON:
+{{
+  "score": number (0-100),
+  "feedback": "short feedback",
+  "confidence": number (0-100)
+}}
 
-    if avg_length < 5:
-        return 40
-    elif avg_length < 12:
-        return 70
-    else:
-        return 90
+Answer:
+\"\"\"{answer}\"\"\"
+"""
+
+    headers = {
+        "Authorization": f"Bearer {MISTRAL_API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "model": "mistral-small",
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.3
+    }
+
+    try:
+        response = requests.post(
+            MISTRAL_URL,
+            headers=headers,
+            json=data,
+            timeout=10   # ⏱ important
+        )
+
+        if response.status_code != 200:
+            print("❌ API Error:", response.text)
+            return None
+
+        res = response.json()
+        content = res["choices"][0]["message"]["content"]
+
+        # 🧠 SAFE JSON EXTRACTION
+        start = content.find("{")
+        end = content.rfind("}") + 1
+        json_str = content[start:end]
+
+        parsed = json.loads(json_str)
+
+        return parsed
+
+    except Exception as e:
+        print("⚠️ Mistral failed:", e)
+        return None
 
 
 def run_nlp_analysis(answer):
 
-    print("\n NLP Analysis Started...")
+    print("\n🔍 NLP Analysis Started...")
 
-    filler = count_filler_words(answer)
-    keyword = keyword_score(answer)
-    sentiment = sentiment_score(answer)
-    clarity = sentence_clarity(answer)
+    if not answer or len(answer.strip()) == 0:
+        return 0, {
+            "Filler Words": 0,
+            "Keyword Matches": 0,
+            "Sentiment Score": 0,
+            "Clarity Score": 0,
+            "Confidence Score": 0
+        }, "No answer detected."
 
-    filler_penalty = max(0, 20 - filler * 3)
+    # 🔥 Try Mistral
+    mistral_result = call_mistral(answer)
 
-    keyword_score_final = min(20, keyword * 5)
+    if mistral_result:
+        score = int(mistral_result.get("score", 50))
+        confidence = int(mistral_result.get("confidence", 50))
+        feedback = mistral_result.get("feedback", "Good answer")
 
-    final_score = int(
-        sentiment * 0.4 +
-        clarity * 0.3 +
-        keyword_score_final * 2 +
-        filler_penalty
-    ) // 2
+        metrics = {
+            "Filler Words": "-",
+            "Keyword Matches": "-",
+            "Sentiment Score": "-",
+            "Clarity Score": "-",
+            "Confidence Score": confidence
+        }
+
+        print("✅ Mistral NLP Analysis Completed")
+        return score, metrics, feedback
+
+    # 🧠 Fallback
+    fallback_score = basic_fallback_score(answer)
 
     metrics = {
-        "Filler Words": filler,
-        "Keyword Matches": keyword,
-        "Sentiment Score": sentiment,
-        "Clarity Score": clarity
+        "Filler Words": "-",
+        "Keyword Matches": "-",
+        "Sentiment Score": fallback_score,
+        "Clarity Score": fallback_score,
+        "Confidence Score": fallback_score
     }
 
-    print(" NLP Analysis Completed")
+    print("⚠️ Fallback NLP used")
 
-    return final_score, metrics
+    return fallback_score, metrics, "Basic evaluation applied. Improve clarity."

@@ -1,0 +1,33 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-28T05:55:49Z",
+  "topic": "Tell me about yourself",
+  "error": "NLP error: not enough values to unpack (expected 3, got 2)",
+  "final_score": 52,
+  "audio_score": 68,
+  "expression_score": 83,
+  "nlp_score": 0,
+  "audio_metrics": {
+    "word_count": 62,
+    "wpm": 148.8,
+    "filler_count": 1,
+    "confident_words": 0,
+    "silence_ratio": 0.3,
+    "energy": 0.003428,
+    "pitch_variation": 36.7,
+    "duration": 25.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.378,
+    "smile_variance": 0.00039,
+    "avg_movement": 0.00316,
+    "emotion_stability": 1.0,
+    "eye_contact": 1.0,
+    "blink_rate": 2.4
+  },
+  "nlp_metrics": {},
+  "transcript": "hello my name is up you know then and today i'm here to give my interview to test my project a in that even eliza this is one of my favorite projects but i have done recently and this is a very interesting project where the user is asked to give his input and her provide insights on the topic thank you",
+  "feedback": "Significant improvement required.",
+  "nlp_feedback": ""
+}

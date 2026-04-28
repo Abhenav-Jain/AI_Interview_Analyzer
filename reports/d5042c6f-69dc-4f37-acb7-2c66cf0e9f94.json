@@ -1,0 +1,38 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-28T06:42:57Z",
+  "topic": "Chess",
+  "final_score": 60,
+  "audio_score": 80,
+  "expression_score": 77,
+  "nlp_score": 20,
+  "audio_metrics": {
+    "word_count": 106,
+    "wpm": 159.0,
+    "filler_count": 1,
+    "confident_words": 0,
+    "silence_ratio": 0.27,
+    "energy": 0.006076,
+    "pitch_variation": 41.6,
+    "duration": 40.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.379,
+    "smile_variance": 0.00075,
+    "avg_movement": 0.00372,
+    "emotion_stability": 0.714,
+    "eye_contact": 1.0,
+    "blink_rate": 40.5
+  },
+  "nlp_metrics": {
+    "Filler Words": "-",
+    "Keyword Matches": "-",
+    "Sentiment Score": "-",
+    "Clarity Score": "-",
+    "Confidence Score": 95
+  },
+  "transcript": "hello everybody jazz is a very beautiful sport it is a strategy game we one needs to think i heard of one steps and it is a very beautiful game ha so in says you have an a bite it by a dog square board in which you have our own can do to pieces that are bonds that are bishops that are rock every piece has and oh a different value you can see a one piece has something one piece has more but in under those in that's s the vito venice to check mood other by killing their by trapping ducking thank you",
+  "feedback": "The answer is highly disorganized, filled with filler words, and lacks coherence. It mentions chess but is difficult to follow due to grammatical errors and unclear phrasing. Technical keywords are misused or incorrect ('rock' instead of 'rook', 'bonds' instead of 'pawns', etc.).",
+  "nlp_feedback": "The answer is highly disorganized, filled with filler words, and lacks coherence. It mentions chess but is difficult to follow due to grammatical errors and unclear phrasing. Technical keywords are misused or incorrect ('rock' instead of 'rook', 'bonds' instead of 'pawns', etc.)."
+}

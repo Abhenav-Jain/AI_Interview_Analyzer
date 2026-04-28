@@ -1,0 +1,38 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-28T06:20:31Z",
+  "topic": "Explain a challenging project",
+  "final_score": 46,
+  "audio_score": 42,
+  "expression_score": 81,
+  "nlp_score": 10,
+  "audio_metrics": {
+    "word_count": 86,
+    "wpm": 206.4,
+    "filler_count": 3,
+    "confident_words": 0,
+    "silence_ratio": 0.19,
+    "energy": 0.004281,
+    "pitch_variation": 30.1,
+    "duration": 25.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.369,
+    "smile_variance": 0.00033,
+    "avg_movement": 0.00283,
+    "emotion_stability": 0.81,
+    "eye_contact": 0.99,
+    "blink_rate": 21.6
+  },
+  "nlp_metrics": {
+    "Filler Words": "-",
+    "Keyword Matches": "-",
+    "Sentiment Score": "-",
+    "Clarity Score": "-",
+    "Confidence Score": 95
+  },
+  "transcript": "so he had i am backspin my he ain't that i'm in a letter which is a complex project so what does that roads i'd do it basically takes a individual frames from the user and also records it has more do you then he converted that are doing to their transcript that is quoted are going to the and it has been a little more do were done it it has done on their know be factors which our pet store bits taxed and etc",
+  "feedback": "The answer is highly incoherent, with frequent grammatical errors, filler words, and unclear phrasing. It lacks relevance, depth, and technical keywords, making it difficult to understand.",
+  "nlp_feedback": "The answer is highly incoherent, with frequent grammatical errors, filler words, and unclear phrasing. It lacks relevance, depth, and technical keywords, making it difficult to understand."
+}

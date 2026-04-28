@@ -1,0 +1,33 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-27T17:41:51Z",
+  "topic": "General Interview",
+  "error": "NLP error: not enough values to unpack (expected 3, got 2)",
+  "final_score": 39,
+  "audio_score": 40,
+  "expression_score": 73,
+  "nlp_score": 0,
+  "audio_metrics": {
+    "word_count": 14,
+    "wpm": 33.6,
+    "filler_count": 0,
+    "confident_words": 0,
+    "silence_ratio": 0.87,
+    "energy": 0.000561,
+    "pitch_variation": 48.7,
+    "duration": 25.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.375,
+    "smile_variance": 0.00057,
+    "avg_movement": 0.0071,
+    "emotion_stability": 0.444,
+    "eye_contact": 0.95,
+    "blink_rate": 91.2
+  },
+  "nlp_metrics": {},
+  "transcript": "ah daycare hello my name is we know ten hour you    don't have any",
+  "feedback": "Significant improvement required.",
+  "nlp_feedback": ""
+}

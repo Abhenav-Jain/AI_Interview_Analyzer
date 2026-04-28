@@ -1,0 +1,33 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-28T06:15:41Z",
+  "topic": "Why should we hire you?",
+  "error": "NLP error: not enough values to unpack (expected 3, got 2)",
+  "final_score": 48,
+  "audio_score": 52,
+  "expression_score": 87,
+  "nlp_score": 0,
+  "audio_metrics": {
+    "word_count": 76,
+    "wpm": 182.4,
+    "filler_count": 0,
+    "confident_words": 0,
+    "silence_ratio": 0.18,
+    "energy": 0.004281,
+    "pitch_variation": 33.2,
+    "duration": 25.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.368,
+    "smile_variance": 0.00047,
+    "avg_movement": 0.00375,
+    "emotion_stability": 0.955,
+    "eye_contact": 0.98,
+    "blink_rate": 31.2
+  },
+  "nlp_metrics": {},
+  "transcript": "you should had me because i'm very hard book van very hard working person i can give your company but it needs i am a team working ludo and i know how to vulcan dame i'm good good and group and dignity grow book i'm hard working a i'm a good guy idea legal access but lot of different kinds of people some very good for a company and that's why you should how to me",
+  "feedback": "Significant improvement required.",
+  "nlp_feedback": ""
+}

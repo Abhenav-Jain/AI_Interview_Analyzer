@@ -1,0 +1,38 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-28T06:50:22Z",
+  "topic": "Explain a challenging project",
+  "final_score": 55,
+  "audio_score": 59,
+  "expression_score": 81,
+  "nlp_score": 20,
+  "audio_metrics": {
+    "word_count": 79,
+    "wpm": 189.6,
+    "filler_count": 1,
+    "confident_words": 0,
+    "silence_ratio": 0.19,
+    "energy": 0.005872,
+    "pitch_variation": 33.4,
+    "duration": 25.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.382,
+    "smile_variance": 0.00047,
+    "avg_movement": 0.00267,
+    "emotion_stability": 0.818,
+    "eye_contact": 1.0,
+    "blink_rate": 19.2
+  },
+  "nlp_metrics": {
+    "Filler Words": "-",
+    "Keyword Matches": "-",
+    "Sentiment Score": "-",
+    "Clarity Score": "-",
+    "Confidence Score": 90
+  },
+  "transcript": "this is my project yeah and that when the laser a complex project where you can buy into technologies like a neural networks deep learning machine learning or do analyst is and many more things you combine all these things and danube of commerce or a dick conversion to get i have your answer and give your do is add up to a dick output this is a very good complex project with as yea and that when it",
+  "feedback": "The answer is highly disorganized, lacks clarity, and contains excessive filler words ('yeah', 'and that when', 'you can', 'or do', 'is and', 'as yea'). It also misuses technical terms ('danube of commerce', 'dick conversion', 'dick output') and fails to explain the project coherently.",
+  "nlp_feedback": "The answer is highly disorganized, lacks clarity, and contains excessive filler words ('yeah', 'and that when', 'you can', 'or do', 'is and', 'as yea'). It also misuses technical terms ('danube of commerce', 'dick conversion', 'dick output') and fails to explain the project coherently."
+}

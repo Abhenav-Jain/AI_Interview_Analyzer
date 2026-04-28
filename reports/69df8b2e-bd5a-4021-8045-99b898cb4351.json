@@ -1,0 +1,33 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-28T06:10:28Z",
+  "topic": "Tell me about yourself",
+  "error": "NLP error: not enough values to unpack (expected 3, got 2)",
+  "final_score": 54,
+  "audio_score": 70,
+  "expression_score": 85,
+  "nlp_score": 0,
+  "audio_metrics": {
+    "word_count": 23,
+    "wpm": 138.0,
+    "filler_count": 0,
+    "confident_words": 0,
+    "silence_ratio": 0.39,
+    "energy": 0.003548,
+    "pitch_variation": 39.3,
+    "duration": 10.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.367,
+    "smile_variance": 0.00053,
+    "avg_movement": 0.00278,
+    "emotion_stability": 1.0,
+    "eye_contact": 1.0,
+    "blink_rate": 24.0
+  },
+  "nlp_metrics": {},
+  "transcript": "hello my name is have enough den and here i'm here to tell you about myself i have studied somebody gets any worse",
+  "feedback": "Significant improvement required.",
+  "nlp_feedback": ""
+}

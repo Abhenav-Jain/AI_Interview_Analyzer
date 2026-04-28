@@ -1,0 +1,33 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-28T06:06:52Z",
+  "topic": "Tell me about yourself",
+  "error": "NLP error: not enough values to unpack (expected 3, got 2)",
+  "final_score": 54,
+  "audio_score": 68,
+  "expression_score": 87,
+  "nlp_score": 0,
+  "audio_metrics": {
+    "word_count": 74,
+    "wpm": 148.0,
+    "filler_count": 1,
+    "confident_words": 0,
+    "silence_ratio": 0.31,
+    "energy": 0.003048,
+    "pitch_variation": 37.7,
+    "duration": 30.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.366,
+    "smile_variance": 0.0004,
+    "avg_movement": 0.00338,
+    "emotion_stability": 0.96,
+    "eye_contact": 0.99,
+    "blink_rate": 26.0
+  },
+  "nlp_metrics": {},
+  "transcript": "hello my name is up you know then i have studied and from medic apps and he was eighteen and currently i'm pursuing my be deck from did in computer science and engineering school my hobbies are to play chess and play video games i also bought a lot of app cities my baby bob cities as a the boys i love playing sudoku and says though this is all about myself thank you",
+  "feedback": "Significant improvement required.",
+  "nlp_feedback": ""
+}

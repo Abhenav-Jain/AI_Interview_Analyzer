@@ -1,0 +1,33 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-27T09:19:42Z",
+  "topic": "Me hu Don",
+  "error": "NLP error: run_nlp_analysis() got an unexpected keyword argument 'topic'",
+  "final_score": 56,
+  "audio_score": 70,
+  "expression_score": 72,
+  "nlp_score": 0,
+  "audio_metrics": {
+    "word_count": 44,
+    "wpm": 105.6,
+    "filler_count": 0,
+    "confident_words": 0,
+    "silence_ratio": 0.58,
+    "energy": 0.002076,
+    "avg_pitch": 174.0,
+    "pitch_variation": 47.3,
+    "duration": 25.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.385,
+    "smile_variance": 0.00298,
+    "avg_movement": 0.00912,
+    "emotion_stability": 0.375,
+    "eye_contact": 0.97,
+    "blink_rate": 19.2
+  },
+  "nlp_metrics": {},
+  "transcript": "on government would probably the word on the a gym work is or later practice right now one of the day i started to go up time now maybe games are nine video games he really must accept didn't have gop candidate but he's",
+  "feedback": "Decent performance. Focus on clarity, reducing hesitations, and maintaining better eye contact."
+}
