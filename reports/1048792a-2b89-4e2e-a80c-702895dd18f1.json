@@ -1,0 +1,38 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-30T09:04:36Z",
+  "topic": "Tell me about yourself",
+  "final_score": 52,
+  "audio_score": 50,
+  "expression_score": 90,
+  "nlp_score": 10,
+  "audio_metrics": {
+    "word_count": 27,
+    "wpm": 108.0,
+    "filler_count": 0,
+    "confident_words": 0,
+    "silence_ratio": 0.67,
+    "energy": 0.000416,
+    "pitch_variation": 49.5,
+    "duration": 15.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.373,
+    "smile_variance": 0.00019,
+    "avg_movement": 0.01133,
+    "emotion_stability": 0.6,
+    "eye_contact": 1.0,
+    "blink_rate": 12.0
+  },
+  "nlp_metrics": {
+    "Filler Words": "-",
+    "Keyword Matches": "-",
+    "Sentiment Score": "-",
+    "Clarity Score": "-",
+    "Confidence Score": 100
+  },
+  "transcript": "it at it that i little bit by some when he was one of them because i mean temple temple  but to them it's their spot with",
+  "feedback": "The answer is completely incoherent and lacks any meaningful content, relevance, or clarity. It is filled with filler words and does not address the question.",
+  "nlp_feedback": "The answer is completely incoherent and lacks any meaningful content, relevance, or clarity. It is filled with filler words and does not address the question."
+}

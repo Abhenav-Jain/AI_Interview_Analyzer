@@ -1,0 +1,38 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-30T04:45:30Z",
+  "topic": "Tell me about yourself",
+  "final_score": 57,
+  "audio_score": 62,
+  "expression_score": 85,
+  "nlp_score": 20,
+  "audio_metrics": {
+    "word_count": 49,
+    "wpm": 117.6,
+    "filler_count": 2,
+    "confident_words": 0,
+    "silence_ratio": 0.49,
+    "energy": 0.001618,
+    "pitch_variation": 38.9,
+    "duration": 25.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.377,
+    "smile_variance": 0.00022,
+    "avg_movement": 0.00271,
+    "emotion_stability": 1.0,
+    "eye_contact": 1.0,
+    "blink_rate": 26.4
+  },
+  "nlp_metrics": {
+    "Filler Words": "-",
+    "Keyword Matches": "-",
+    "Sentiment Score": "-",
+    "Clarity Score": "-",
+    "Confidence Score": 95
+  },
+  "transcript": "hello everyone my name is up you know ten and today i'm going to tell you about myself so i have done my bit dead chromatograms university and completed my schooling tongue with as either school there's a private school and i'm very hopeful for my future thank you",
+  "feedback": "The answer is highly disorganized, contains many filler words ('you know', 'so', 'there's', 'very'), and lacks relevance, depth, and technical keywords. The response is unclear and does not effectively communicate any meaningful information.",
+  "nlp_feedback": "The answer is highly disorganized, contains many filler words ('you know', 'so', 'there's', 'very'), and lacks relevance, depth, and technical keywords. The response is unclear and does not effectively communicate any meaningful information."
+}

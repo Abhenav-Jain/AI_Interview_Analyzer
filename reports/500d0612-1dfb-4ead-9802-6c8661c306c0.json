@@ -1,0 +1,38 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-30T08:30:53Z",
+  "topic": "university",
+  "final_score": 63,
+  "audio_score": 67,
+  "expression_score": 88,
+  "nlp_score": 30,
+  "audio_metrics": {
+    "word_count": 58,
+    "wpm": 139.2,
+    "filler_count": 0,
+    "confident_words": 0,
+    "silence_ratio": 0.34,
+    "energy": 0.001068,
+    "pitch_variation": 29.3,
+    "duration": 25.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.38,
+    "smile_variance": 0.0003,
+    "avg_movement": 0.00369,
+    "emotion_stability": 0.739,
+    "eye_contact": 0.99,
+    "blink_rate": 31.2
+  },
+  "nlp_metrics": {
+    "Filler Words": "-",
+    "Keyword Matches": "-",
+    "Sentiment Score": "-",
+    "Clarity Score": "-",
+    "Confidence Score": 90
+  },
+  "transcript": "universities a place where we started we have we learned concepts i know bill been with different types of people we learn the causes of live in the university that's by university is a very important elements everyone reserve university and his without a college town and this is very helpful for him to grow in his late",
+  "feedback": "The answer is highly disorganized, lacks coherence, and contains numerous grammatical errors. It also includes filler words and does not effectively communicate a clear point about the importance of universities.",
+  "nlp_feedback": "The answer is highly disorganized, lacks coherence, and contains numerous grammatical errors. It also includes filler words and does not effectively communicate a clear point about the importance of universities."
+}

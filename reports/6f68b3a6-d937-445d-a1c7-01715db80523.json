@@ -1,0 +1,38 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-30T08:25:36Z",
+  "topic": "Introduction",
+  "final_score": 50,
+  "audio_score": 55,
+  "expression_score": 80,
+  "nlp_score": 10,
+  "audio_metrics": {
+    "word_count": 27,
+    "wpm": 162.0,
+    "filler_count": 0,
+    "confident_words": 0,
+    "silence_ratio": 0.38,
+    "energy": 0.001012,
+    "pitch_variation": 25.5,
+    "duration": 10.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.364,
+    "smile_variance": 0.00031,
+    "avg_movement": 0.00289,
+    "emotion_stability": 0.75,
+    "eye_contact": 1.0,
+    "blink_rate": 24.0
+  },
+  "nlp_metrics": {
+    "Filler Words": "-",
+    "Keyword Matches": "-",
+    "Sentiment Score": "-",
+    "Clarity Score": "-",
+    "Confidence Score": 95
+  },
+  "transcript": "and everybody i name is or becomes an end to the i'm going to tell you about my as as i'm very envious yeah stick person enough",
+  "feedback": "The answer is completely incoherent and lacks any relevance, clarity, or technical content. It contains excessive filler words and does not address the question.",
+  "nlp_feedback": "The answer is completely incoherent and lacks any relevance, clarity, or technical content. It contains excessive filler words and does not address the question."
+}

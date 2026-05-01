@@ -1,0 +1,38 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-30T04:39:43Z",
+  "topic": "Tell me about yourself",
+  "final_score": 52,
+  "audio_score": 70,
+  "expression_score": 70,
+  "nlp_score": 10,
+  "audio_metrics": {
+    "word_count": 19,
+    "wpm": 114.0,
+    "filler_count": 0,
+    "confident_words": 0,
+    "silence_ratio": 0.53,
+    "energy": 0.00387,
+    "pitch_variation": 48.1,
+    "duration": 10.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.4,
+    "smile_variance": 0.00191,
+    "avg_movement": 0.00211,
+    "emotion_stability": 1.0,
+    "eye_contact": 1.0,
+    "blink_rate": 0.0
+  },
+  "nlp_metrics": {
+    "Filler Words": "-",
+    "Keyword Matches": "-",
+    "Sentiment Score": "-",
+    "Clarity Score": "-",
+    "Confidence Score": 100
+  },
+  "transcript": "hello my name is have enough of dead and today i'm here to tell you about myself thank you",
+  "feedback": "The answer is completely irrelevant, contains numerous filler words, and lacks any meaningful content or structure.",
+  "nlp_feedback": "The answer is completely irrelevant, contains numerous filler words, and lacks any meaningful content or structure."
+}

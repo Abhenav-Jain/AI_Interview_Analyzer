@@ -156,6 +156,9 @@ def _run_session(session_id: str, duration: int, topic: str):
         "nlp_feedback": nlp_feedback
     })
 
+    sessions[session_id] = sess
+    print("✅ SESSION COMPLETED:", sessions[session_id]["status"])
+
     _save_report(session_id, sess)
 
 

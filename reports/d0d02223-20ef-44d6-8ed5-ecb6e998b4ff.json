@@ -1,0 +1,38 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-30T10:36:28Z",
+  "topic": "About Myself",
+  "final_score": 75,
+  "audio_score": 60,
+  "expression_score": 88,
+  "nlp_score": 80,
+  "audio_metrics": {
+    "word_count": 38,
+    "wpm": 152.0,
+    "filler_count": 0,
+    "confident_words": 0,
+    "silence_ratio": 0.51,
+    "energy": 0.000632,
+    "pitch_variation": 45.4,
+    "duration": 15.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.364,
+    "smile_variance": 8e-05,
+    "avg_movement": 0.01184,
+    "emotion_stability": 1.0,
+    "eye_contact": 1.0,
+    "blink_rate": 0.0
+  },
+  "nlp_metrics": {
+    "Filler Words": "-",
+    "Keyword Matches": "-",
+    "Sentiment Score": 80,
+    "Clarity Score": 80,
+    "Confidence Score": 80
+  },
+  "transcript": "but it would you mind it is i haven't got a better than this topic because i'm not going to end up i live here to get into new book i do anything  an argument with a of",
+  "feedback": "Basic evaluation applied. Improve clarity.",
+  "nlp_feedback": "Basic evaluation applied. Improve clarity."
+}

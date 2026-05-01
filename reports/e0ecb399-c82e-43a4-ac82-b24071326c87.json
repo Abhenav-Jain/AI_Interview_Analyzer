@@ -1,0 +1,38 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-30T03:20:52Z",
+  "topic": "Chess",
+  "final_score": 59,
+  "audio_score": 70,
+  "expression_score": 82,
+  "nlp_score": 20,
+  "audio_metrics": {
+    "word_count": 85,
+    "wpm": 127.5,
+    "filler_count": 0,
+    "confident_words": 0,
+    "silence_ratio": 0.43,
+    "energy": 0.002412,
+    "pitch_variation": 42.2,
+    "duration": 40.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.373,
+    "smile_variance": 0.00067,
+    "avg_movement": 0.00338,
+    "emotion_stability": 0.946,
+    "eye_contact": 0.99,
+    "blink_rate": 37.5
+  },
+  "nlp_metrics": {
+    "Filler Words": "-",
+    "Keyword Matches": "-",
+    "Sentiment Score": "-",
+    "Clarity Score": "-",
+    "Confidence Score": 95
+  },
+  "transcript": "that's it a very beautiful game it is the lab for a vote of love in india ah two thousand years ago says has ah splatter bored of it grows eight view you have i don't do to pieces and this is a very beautiful game for two blades as you need to players and a inches oh god tears was a or lurch as was played by kings it is a strategic game where you apply our brains that is a very good game",
+  "feedback": "The answer is highly disorganized, contains numerous filler words ('ah', 'oh god', 'you have'), and lacks clear communication. It mentions a game but fails to explain it coherently or use relevant technical keywords effectively.",
+  "nlp_feedback": "The answer is highly disorganized, contains numerous filler words ('ah', 'oh god', 'you have'), and lacks clear communication. It mentions a game but fails to explain it coherently or use relevant technical keywords effectively."
+}

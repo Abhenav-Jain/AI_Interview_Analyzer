@@ -1,56 +1,138 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import "./App.css";
 
 const API = "http://localhost:8000";
 
-const scoreColor = (s) =>
-  s >= 85 ? "#22c55e" : s >= 70 ? "#3b82f6" : s >= 55 ? "#f59e0b" : "#ef4444";
+const DEFAULT_TOPIC = "General Interview";
 
-const scoreLabel = (s) =>
-  s >= 85 ? "Outstanding" : s >= 70 ? "Strong" : s >= 55 ? "Decent" : "Needs Work";
+const topicSuggestions = [
+  "Tell me about yourself",
+  "Why should we hire you?",
+  "Describe a challenging project",
+  "Explain a leadership experience",
+  "How would you scale a backend system?",
+  "Explain system design of Netflix",
+];
 
-// ─────────────────────────────────────────────
-// Topic Selector (Search + Manual + Suggestions)
-// ─────────────────────────────────────────────
+function scoreColor(score) {
+  if (score >= 85) return "excellent";
+  if (score >= 70) return "strong";
+  if (score >= 55) return "average";
+  return "weak";
+}
+
+function scoreLabel(score) {
+  if (score >= 85) return "Outstanding";
+  if (score >= 70) return "Strong";
+  if (score >= 55) return "Decent";
+  return "Needs Work";
+}
+
+function scoreMessage(score) {
+  if (score >= 85) return "You are interview-ready with only minor refinements left.";
+  if (score >= 70) return "Good base. A little more structure and polish can push you higher.";
+  if (score >= 55) return "You have potential, but clarity and consistency need work.";
+  return "The fundamentals need improvement before this becomes interview-ready.";
+}
+
+function normalizeMetricEntries(metrics) {
+  if (!metrics || typeof metrics !== "object") return [];
+  return Object.entries(metrics);
+}
+
+function extractImprovementAreas(session) {
+  const areas = [];
+
+  if ((session?.nlp_score ?? 0) < 60) {
+    areas.push({
+      title: "Answer structure",
+      text: "Your response needs better flow, clearer sequencing, and more coherent sentence construction.",
+    });
+  }
+
+  if ((session?.audio_score ?? 0) < 60) {
+    areas.push({
+      title: "Speech delivery",
+      text: "Work on filler-word control, pace balance, and cleaner verbal delivery.",
+    });
+  }
+
+  if ((session?.expression_score ?? 0) < 60) {
+    areas.push({
+      title: "Expression and presence",
+      text: "Improve eye contact, confidence, facial engagement, and on-camera stability.",
+    });
+  }
+
+  if (!areas.length) {
+    areas.push({
+      title: "Fine-tuning",
+      text: "Your performance is solid overall. Focus on sharper examples and more concise responses.",
+    });
+  }
+
+  return areas;
+}
+
+function buildTips(session) {
+  const tips = [];
+
+  if ((session?.nlp_score ?? 0) < 70) {
+    tips.push("Use a simple beginning-middle-end structure before answering.");
+    tips.push("Avoid rambling; keep each answer focused on one clear point.");
+  }
+
+  if ((session?.audio_score ?? 0) < 70) {
+    tips.push("Reduce filler words by slowing down before key points.");
+  }
+
+  if ((session?.expression_score ?? 0) < 70) {
+    tips.push("Maintain steady posture and consistent facial engagement while speaking.");
+  }
+
+  if (!tips.length) {
+    tips.push("Practice with role-specific questions to sharpen your delivery further.");
+  }
+
+  return [...new Set(tips)].slice(0, 4);
+}
+
 function TopicSelector({ topic, setTopic }) {
-  const suggestions = [
-    "Tell me about yourself",
-    "Explain a challenging project",
-    "Why should we hire you?",
-    "Describe leadership experience",
-    "Explain system design of Netflix",
-    "How would you scale a backend system?",
-  ];
+  const [open, setOpen] = useState(false);
 
-  const [filtered, setFiltered] = useState([]);
-
-  useEffect(() => {
-    if (!topic) return setFiltered([]);
-
-    const f = suggestions.filter((t) =>
-      t.toLowerCase().includes(topic.toLowerCase())
+  const filtered = useMemo(() => {
+    if (!topic.trim()) return topicSuggestions;
+    return topicSuggestions.filter((item) =>
+      item.toLowerCase().includes(topic.toLowerCase())
     );
-    setFiltered(f);
   }, [topic]);
 
   return (
-    <div style={{ position: "relative" }}>
+    <div className="topic-selector">
       <input
+        className="app-input"
         value={topic}
-        onChange={(e) => setTopic(e.target.value)}
-        placeholder="Type or search topic..."
-        style={styles.input}
+        onFocus={() => setOpen(true)}
+        onChange={(e) => {
+          setTopic(e.target.value);
+          setOpen(true);
+        }}
+        placeholder="Type or search interview topic..."
       />
-
-      {filtered.length > 0 && (
-        <div style={styles.dropdown}>
-          {filtered.map((t, i) => (
-            <div
-              key={i}
-              style={styles.dropdownItem}
-              onClick={() => setTopic(t)}
+      {open && filtered.length > 0 && (
+        <div className="topic-dropdown">
+          {filtered.slice(0, 6).map((item) => (
+            <button
+              key={item}
+              type="button"
+              className="topic-option"
+              onClick={() => {
+                setTopic(item);
+                setOpen(false);
+              }}
             >
-              {t}
-            </div>
+              {item}
+            </button>
           ))}
         </div>
       )}
@@ -58,265 +140,367 @@ function TopicSelector({ topic, setTopic }) {
   );
 }
 
-// ─────────────────────────────────────────────
-// Live Interview UI
-// ─────────────────────────────────────────────
-function LiveInterview({ duration }) {
-  const [time, setTime] = useState(duration);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTime((t) => (t > 0 ? t - 1 : 0));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
+function ScoreRing({ score }) {
+  const angle = Math.max(0, Math.min(100, score || 0)) * 3.6;
   return (
-    <div style={styles.liveCard}>
-      <div style={styles.pulse}></div>
-      <h2>🎙 Interview in Progress</h2>
-      <div style={styles.timer}>{time}s</div>
+    <div
+      className={`score-ring ${scoreColor(score)}`}
+      style={{
+        background: `conic-gradient(var(--ring) ${angle}deg, rgba(255,255,255,0.08) ${angle}deg)`,
+      }}
+    >
+      <div className="score-ring-inner">
+        <div className="score-ring-value">{score ?? 0}</div>
+        <div className="score-ring-total">/100</div>
+      </div>
     </div>
   );
 }
 
-// ─────────────────────────────────────────────
-// Score Card
-// ─────────────────────────────────────────────
-function ScoreCard({ label, value }) {
+function ScoreCard({ title, value }) {
   return (
-    <div style={styles.scoreCard}>
-      <div style={{ fontSize: 13, color: "#94a3b8" }}>{label}</div>
-      <div style={{ fontSize: 22, fontWeight: 700 }}>{value}</div>
+    <div className="score-card">
+      <span>{title}</span>
+      <strong>{value ?? 0}</strong>
     </div>
   );
 }
 
-// ─────────────────────────────────────────────
-// MAIN APP
-// ─────────────────────────────────────────────
+function MetricList({ title, metrics }) {
+  const items = normalizeMetricEntries(metrics);
+
+  return (
+    <div className="detail-card">
+      <div className="detail-card-head">
+        <h4>{title}</h4>
+      </div>
+      {items.length ? (
+        <div className="metric-list">
+          {items.map(([key, value]) => (
+            <div key={key} className="metric-row">
+              <span>{key}</span>
+              <strong>{String(value)}</strong>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="empty-text">Detailed metrics were not available for this module.</p>
+      )}
+    </div>
+  );
+}
+
 export default function App() {
   const [session, setSession] = useState(null);
   const [sessionId, setSessionId] = useState(null);
   const [polling, setPolling] = useState(false);
   const [duration, setDuration] = useState("25");
   const [topic, setTopic] = useState("");
-
+  const [error, setError] = useState("");
   const pollRef = useRef(null);
 
   const isRunning = session?.status === "running";
   const isDone = session?.status === "done";
+  const progress = session?.progress ?? 0;
 
   useEffect(() => {
     if (!polling || !sessionId) return;
 
     pollRef.current = setInterval(async () => {
-      const r = await fetch(`${API}/session/${sessionId}`);
-      const d = await r.json();
-      setSession(d);
+      try {
+        const response = await fetch(`${API}/session/${sessionId}`);
+        if (!response.ok) {
+          throw new Error("Unable to fetch session status");
+        }
+        const data = await response.json();
+        setSession(data);
 
-      if (d.status === "done") {
+        if (data.status === "done") {
+          clearInterval(pollRef.current);
+          setPolling(false);
+        }
+
+        if (data.error) {
+          setError(data.error);
+        }
+      } catch (err) {
         clearInterval(pollRef.current);
         setPolling(false);
+        setError(err.message || "Something went wrong while fetching session data.");
       }
-    }, 800);
+    }, 1000);
 
     return () => clearInterval(pollRef.current);
   }, [polling, sessionId]);
 
   const startSession = async () => {
-    const r = await fetch(`${API}/session/start`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        duration: parseInt(duration),
-        topic: topic || "General Interview",
-      }),
-    });
+    setError("");
+    setSession(null);
 
-    const d = await r.json();
+    try {
+      const response = await fetch(`${API}/session/start`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          duration: parseInt(duration, 10),
+          topic: topic.trim() || DEFAULT_TOPIC,
+        }),
+      });
 
-    setSessionId(d.session_id);
-    setSession({ status: "running" });
-    setPolling(true);
+      if (!response.ok) {
+        throw new Error("Failed to start interview session");
+      }
+
+      const data = await response.json();
+      setSessionId(data.session_id);
+      setSession({
+        status: "running",
+        progress: 0,
+        topic: topic.trim() || DEFAULT_TOPIC,
+      });
+      setPolling(true);
+    } catch (err) {
+      setError(err.message || "Unable to start the interview.");
+    }
   };
 
+  const resetApp = () => {
+    setSession(null);
+    setSessionId(null);
+    setPolling(false);
+    setError("");
+    setTopic("");
+    setDuration("25");
+    if (pollRef.current) clearInterval(pollRef.current);
+  };
+
+  const improvementAreas = extractImprovementAreas(session);
+  const tips = buildTips(session);
+
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>AI Interview Analyzer</h1>
-        <p style={styles.subtitle}>Practice interviews with AI feedback</p>
+    <div className="app-shell">
+      <main className="app-container">
+        <section className="hero-card">
+          <div className="hero-copy">
+            <span className="eyebrow">AI-powered mock interview workspace</span>
+            <h1>AI Interview Analyzer</h1>
+            <p>
+              Practice smarter with live tracking, transcript review, module-wise
+              scoring, and clear improvement guidance after every attempt.
+            </p>
+          </div>
+
+          <div className="hero-badge">
+            <span>Interview mode</span>
+            <strong>{topic.trim() || DEFAULT_TOPIC}</strong>
+          </div>
+        </section>
 
         {!isRunning && !isDone && (
-          <>
-            <div style={styles.field}>
-              <label style={styles.label}>Interview Topic</label>
-              <TopicSelector topic={topic} setTopic={setTopic} />
+          <section className="setup-grid">
+            <div className="panel panel-lg">
+              <div className="panel-head center">
+                <h2>Interview setup</h2>
+                <p>Choose your topic and session length before starting.</p>
+              </div>
+
+              <div className="form-stack">
+                <div className="field-block">
+                  <label className="field-label">Interview topic</label>
+                  <TopicSelector topic={topic} setTopic={setTopic} />
+                </div>
+
+                <div className="field-block">
+                  <label className="field-label">Duration</label>
+                  <div className="duration-row">
+                    {["15", "25", "35", "45"].map((item) => (
+                      <button
+                        key={item}
+                        type="button"
+                        className={`chip ${duration === item ? "active" : ""}`}
+                        onClick={() => setDuration(item)}
+                      >
+                        {item}s
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <button type="button" className="primary-btn" onClick={startSession}>
+                  Start Interview
+                </button>
+
+                {error && <div className="error-box">{error}</div>}
+              </div>
             </div>
 
-            <div style={styles.field}>
-              <label style={styles.label}>Duration (seconds)</label>
-              <input
-                type="number"
-                value={duration}
-                onChange={(e) => setDuration(e.target.value)}
-                style={styles.input}
-              />
-            </div>
+            <div className="panel panel-lg">
+              <div className="panel-head center">
+                <h2>What you’ll get</h2>
+                <p>Real interview-style analysis from multiple evaluation modules.</p>
+              </div>
 
-            <button style={styles.button} onClick={startSession}>
-              🚀 Start Interview
-            </button>
-          </>
+              <div className="feature-list">
+                <div className="feature-card">
+                  <div className="feature-icon">🎙</div>
+                  <div>
+                    <strong>Audio analysis</strong>
+                    <p>Speech pace, filler-word control, and fluency markers.</p>
+                  </div>
+                </div>
+
+                <div className="feature-card">
+                  <div className="feature-icon">📷</div>
+                  <div>
+                    <strong>Expression analysis</strong>
+                    <p>Confidence, presence, and eye-contact related feedback.</p>
+                  </div>
+                </div>
+
+                <div className="feature-card">
+                  <div className="feature-icon">🧠</div>
+                  <div>
+                    <strong>NLP analysis</strong>
+                    <p>Clarity, coherence, and answer quality evaluation.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         )}
 
-        {isRunning && <LiveInterview duration={parseInt(duration)} />}
+        {isRunning && (
+          <section className="live-layout">
+            <div className="panel live-panel">
+              <div className="live-status">
+                <div className="live-dot"></div>
+                <span>Interview in progress</span>
+              </div>
+
+              <h2>Analyzing your interview session</h2>
+              <p className="muted">
+                Please speak naturally. Audio, expressions, and language quality are being processed.
+              </p>
+
+              <div className="progress-block">
+                <div className="progress-meta">
+                  <span>Progress</span>
+                  <strong>{progress}%</strong>
+                </div>
+                <div className="progress-track">
+                  <div className="progress-fill" style={{ width: `${progress}%` }} />
+                </div>
+              </div>
+
+              <div className="live-grid">
+                <div className="mini-card">
+                  <span>Topic</span>
+                  <strong>{session?.topic || topic || DEFAULT_TOPIC}</strong>
+                </div>
+                <div className="mini-card">
+                  <span>Duration</span>
+                  <strong>{duration}s</strong>
+                </div>
+                <div className="mini-card">
+                  <span>Status</span>
+                  <strong>Running</strong>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         {isDone && (
-          <div style={styles.results}>
-            <h2 style={{ color: scoreColor(session.final_score) }}>
-              {session.final_score}/100
-            </h2>
-            <p>{scoreLabel(session.final_score)}</p>
+          <section className="results-layout">
+            <div className="results-top">
+              <div className="panel result-hero">
+                <div className="result-main">
+                  <ScoreRing score={session.final_score} />
+                  <div className="result-copy">
+                    <div className={`score-pill ${scoreColor(session.final_score)}`}>
+                      {scoreLabel(session.final_score)}
+                    </div>
+                    <h2>Overall interview performance</h2>
+                    <p>{scoreMessage(session.final_score)}</p>
+                  </div>
+                </div>
 
-            <div style={styles.feedback}>
-              🤖 {session.nlp_feedback || session.feedback}
+                <div className="feedback-box">
+                  <span>AI feedback</span>
+                  <p>{session?.nlp_feedback || session?.feedback || "Feedback not available."}</p>
+                </div>
+              </div>
+
+              <div className="panel action-panel">
+                <div className="panel-head">
+                  <h3>Next attempt</h3>
+                  <p>Use this review to improve before trying again.</p>
+                </div>
+
+                <button className="primary-btn" type="button" onClick={resetApp}>
+                  Start New Interview
+                </button>
+              </div>
             </div>
 
-            <div style={styles.scoreGrid}>
-              <ScoreCard label="Audio" value={session.audio_score} />
-              <ScoreCard label="Expression" value={session.expression_score} />
-              <ScoreCard label="NLP" value={session.nlp_score} />
+            <div className="score-grid">
+              <ScoreCard title="Audio Score" value={session.audio_score} />
+              <ScoreCard title="Expression Score" value={session.expression_score} />
+              <ScoreCard title="NLP Score" value={session.nlp_score} />
             </div>
-          </div>
+
+            <div className="insight-grid">
+              <div className="panel">
+                <div className="panel-head">
+                  <h3>Where you should improve</h3>
+                  <p>Focus on the lowest-impact areas first for faster gains.</p>
+                </div>
+
+                <div className="improvement-list">
+                  {improvementAreas.map((item) => (
+                    <div key={item.title} className="improvement-card">
+                      <strong>{item.title}</strong>
+                      <p>{item.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="panel">
+                <div className="panel-head">
+                  <h3>Actionable tips</h3>
+                  <p>These are the easiest fixes you can apply in your next answer.</p>
+                </div>
+
+                <ul className="tips-list">
+                  {tips.map((tip) => (
+                    <li key={tip}>{tip}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="details-grid">
+              <MetricList title="Audio metrics" metrics={session.audio_metrics} />
+              <MetricList title="Expression metrics" metrics={session.expression_metrics} />
+              <MetricList title="NLP metrics" metrics={session.nlp_metrics} />
+            </div>
+
+            <div className="panel transcript-panel">
+              <div className="panel-head">
+                <h3>Transcript</h3>
+                <p>Review exactly what the system captured during your answer.</p>
+              </div>
+
+              <div className="transcript-box">
+                {session?.transcript?.trim()
+                  ? session.transcript
+                  : "Transcript not available for this session."}
+              </div>
+            </div>
+          </section>
         )}
-      </div>
+      </main>
     </div>
   );
 }
-
-// ─────────────────────────────────────────────
-// STYLES
-// ─────────────────────────────────────────────
-const styles = {
-  container: {
-    minHeight: "100vh",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    background: "linear-gradient(135deg,#020617,#0f172a)",
-    fontFamily: "Inter, sans-serif",
-  },
-
-  card: {
-    width: "100%",
-    maxWidth: 600,
-    padding: 30,
-    borderRadius: 20,
-    background: "rgba(255,255,255,0.05)",
-    backdropFilter: "blur(20px)",
-    boxShadow: "0 20px 80px rgba(0,0,0,0.5)",
-    color: "#fff",
-  },
-
-  title: {
-    fontSize: 32,
-    fontWeight: 800,
-    textAlign: "center",
-  },
-
-  subtitle: {
-    textAlign: "center",
-    color: "#94a3b8",
-    marginBottom: 30,
-  },
-
-  field: {
-    marginBottom: 20,
-  },
-
-  label: {
-    fontSize: 13,
-    marginBottom: 6,
-    display: "block",
-    color: "#94a3b8",
-  },
-
-  input: {
-    width: "100%",
-    padding: 14,
-    borderRadius: 12,
-    border: "1px solid rgba(255,255,255,0.1)",
-    background: "rgba(255,255,255,0.05)",
-    color: "#fff",
-  },
-
-  dropdown: {
-    position: "absolute",
-    width: "100%",
-    background: "#020617",
-    borderRadius: 10,
-    marginTop: 6,
-    overflow: "hidden",
-  },
-
-  dropdownItem: {
-    padding: 10,
-    cursor: "pointer",
-  },
-
-  button: {
-    width: "100%",
-    padding: 14,
-    borderRadius: 12,
-    border: "none",
-    background: "linear-gradient(90deg,#6366f1,#3b82f6)",
-    color: "#fff",
-    fontWeight: 700,
-    cursor: "pointer",
-  },
-
-  liveCard: {
-    textAlign: "center",
-    padding: 30,
-  },
-
-  timer: {
-    fontSize: 40,
-    fontWeight: 800,
-  },
-
-  pulse: {
-    width: 20,
-    height: 20,
-    background: "red",
-    borderRadius: "50%",
-    margin: "0 auto 10px",
-    animation: "pulse 1s infinite",
-  },
-
-  results: {
-    textAlign: "center",
-  },
-
-  feedback: {
-    marginTop: 10,
-    background: "rgba(255,255,255,0.05)",
-    padding: 12,
-    borderRadius: 10,
-  },
-
-  scoreGrid: {
-    display: "flex",
-    justifyContent: "space-between",
-    marginTop: 20,
-  },
-
-  scoreCard: {
-    flex: 1,
-    margin: 5,
-    padding: 15,
-    background: "rgba(255,255,255,0.05)",
-    borderRadius: 10,
-  },
-};

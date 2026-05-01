@@ -1,0 +1,38 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-30T10:38:38Z",
+  "topic": "Describe a challenging project",
+  "final_score": 48,
+  "audio_score": 50,
+  "expression_score": 80,
+  "nlp_score": 10,
+  "audio_metrics": {
+    "word_count": 46,
+    "wpm": 184.0,
+    "filler_count": 0,
+    "confident_words": 0,
+    "silence_ratio": 0.46,
+    "energy": 0.001715,
+    "pitch_variation": 48.1,
+    "duration": 15.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.362,
+    "smile_variance": 0.00072,
+    "avg_movement": 0.01031,
+    "emotion_stability": 0.6,
+    "eye_contact": 0.7,
+    "blink_rate": 12.0
+  },
+  "nlp_metrics": {
+    "Filler Words": "-",
+    "Keyword Matches": "-",
+    "Sentiment Score": "-",
+    "Clarity Score": "-",
+    "Confidence Score": 95
+  },
+  "transcript": "but it but i didn't publish it does applicants and maybe that and here again later but again on this topic of the a a pebble beach at night it i couldn't get any basic and i met a guy to protect and get to guy",
+  "feedback": "The answer is highly incoherent, with excessive filler words, repetition, and no clear structure or relevance to the topic.",
+  "nlp_feedback": "The answer is highly incoherent, with excessive filler words, repetition, and no clear structure or relevance to the topic."
+}

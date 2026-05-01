@@ -1,0 +1,38 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-30T08:01:28Z",
+  "topic": "Talk about a leadership experience",
+  "final_score": 52,
+  "audio_score": 53,
+  "expression_score": 72,
+  "nlp_score": 30,
+  "audio_metrics": {
+    "word_count": 86,
+    "wpm": 172.0,
+    "filler_count": 2,
+    "confident_words": 0,
+    "silence_ratio": 0.24,
+    "energy": 0.001406,
+    "pitch_variation": 29.2,
+    "duration": 30.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.38,
+    "smile_variance": 0.00035,
+    "avg_movement": 0.00243,
+    "emotion_stability": 0.852,
+    "eye_contact": 1.0,
+    "blink_rate": 36.0
+  },
+  "nlp_metrics": {
+    "Filler Words": "-",
+    "Keyword Matches": "-",
+    "Sentiment Score": "-",
+    "Clarity Score": "-",
+    "Confidence Score": 90
+  },
+  "transcript": "derby when my name is up you know extent and got a i'm going to tell you about my leadership experience and ladies and protect their i guided my teammates to lug accordingly with no invoke ah it was my first experience either team leader and item that is bothering to guide them properly and to as and amd or task to guide them but not willing to go to one gun on time so this was my experience as our team leader in my journey",
+  "feedback": "The answer is highly disorganized, filled with filler words ('you know', 'ah', 'as and amd'), and lacks clarity. Key points are mentioned but are incoherent and difficult to follow. Technical keywords are missing, and the response does not demonstrate relevance or depth.",
+  "nlp_feedback": "The answer is highly disorganized, filled with filler words ('you know', 'ah', 'as and amd'), and lacks clarity. Key points are mentioned but are incoherent and difficult to follow. Technical keywords are missing, and the response does not demonstrate relevance or depth."
+}

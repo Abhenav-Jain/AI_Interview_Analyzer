@@ -1,0 +1,38 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-30T08:35:45Z",
+  "topic": "Why should we hire you?",
+  "final_score": 46,
+  "audio_score": 48,
+  "expression_score": 80,
+  "nlp_score": 5,
+  "audio_metrics": {
+    "word_count": 47,
+    "wpm": 188.0,
+    "filler_count": 0,
+    "confident_words": 0,
+    "silence_ratio": 0.24,
+    "energy": 0.001107,
+    "pitch_variation": 26.6,
+    "duration": 15.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.372,
+    "smile_variance": 0.00023,
+    "avg_movement": 0.00271,
+    "emotion_stability": 1.0,
+    "eye_contact": 1.0,
+    "blink_rate": 44.0
+  },
+  "nlp_metrics": {
+    "Filler Words": "-",
+    "Keyword Matches": "-",
+    "Sentiment Score": "-",
+    "Clarity Score": "-",
+    "Confidence Score": 95
+  },
+  "transcript": "how do you should have mean because er i'm not dusted can mutate and i can give your company wanted it's host of i have all what it is their jungle any no description and i will be fruitful do not come near never been doyle candidate",
+  "feedback": "The answer is completely incoherent and lacks relevance, clarity, and technical keywords. It appears to be a nonsensical mix of words with no coherent structure or meaning.",
+  "nlp_feedback": "The answer is completely incoherent and lacks relevance, clarity, and technical keywords. It appears to be a nonsensical mix of words with no coherent structure or meaning."
+}

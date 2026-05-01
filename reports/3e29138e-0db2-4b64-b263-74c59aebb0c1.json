@@ -1,0 +1,38 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-30T10:53:33Z",
+  "topic": "Tell me about yourself",
+  "final_score": 38,
+  "audio_score": 60,
+  "expression_score": 45,
+  "nlp_score": 5,
+  "audio_metrics": {
+    "word_count": 38,
+    "wpm": 91.2,
+    "filler_count": 0,
+    "confident_words": 0,
+    "silence_ratio": 0.51,
+    "energy": 0.001067,
+    "pitch_variation": 49.9,
+    "duration": 25.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.374,
+    "smile_variance": 0.0044,
+    "avg_movement": 0.037,
+    "emotion_stability": 0.429,
+    "eye_contact": 0.87,
+    "blink_rate": 38.4
+  },
+  "nlp_metrics": {
+    "Filler Words": "-",
+    "Keyword Matches": "-",
+    "Sentiment Score": "-",
+    "Clarity Score": "-",
+    "Confidence Score": 100
+  },
+  "transcript": "obesity build equity maybe systems a because he doesn't do not be if you don't a lot of stand up what you automatically i met up with us everyone it doesn't get i've really been a christmas melee",
+  "feedback": "The answer is completely irrelevant, incoherent, and lacks any meaningful content or structure.",
+  "nlp_feedback": "The answer is completely irrelevant, incoherent, and lacks any meaningful content or structure."
+}

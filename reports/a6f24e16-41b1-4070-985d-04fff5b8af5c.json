@@ -1,0 +1,38 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-30T07:22:19Z",
+  "topic": "Tell me about yourself",
+  "final_score": 57,
+  "audio_score": 74,
+  "expression_score": 86,
+  "nlp_score": 5,
+  "audio_metrics": {
+    "word_count": 39,
+    "wpm": 156.0,
+    "filler_count": 0,
+    "confident_words": 0,
+    "silence_ratio": 0.24,
+    "energy": 0.001924,
+    "pitch_variation": 41.6,
+    "duration": 15.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.377,
+    "smile_variance": 0.00014,
+    "avg_movement": 0.00311,
+    "emotion_stability": 0.333,
+    "eye_contact": 1.0,
+    "blink_rate": 24.0
+  },
+  "nlp_metrics": {
+    "Filler Words": "-",
+    "Keyword Matches": "-",
+    "Sentiment Score": "-",
+    "Clarity Score": "-",
+    "Confidence Score": 95
+  },
+  "transcript": "and everybody my name is up enough to and but i'm going to tell you about myself and my neighbors up in and i'm starting my to get any worse than or thing my protect from hell thank you",
+  "feedback": "The answer is completely incoherent with excessive filler words, no relevance to the topic, and lacks any meaningful structure or technical keywords.",
+  "nlp_feedback": "The answer is completely incoherent with excessive filler words, no relevance to the topic, and lacks any meaningful structure or technical keywords."
+}

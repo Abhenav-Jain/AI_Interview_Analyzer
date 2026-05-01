@@ -1,0 +1,38 @@
+{
+  "status": "done",
+  "progress": 100,
+  "started_at": "2026-04-30T04:36:53Z",
+  "topic": "Tell me about yourself",
+  "final_score": 55,
+  "audio_score": 69,
+  "expression_score": 80,
+  "nlp_score": 10,
+  "audio_metrics": {
+    "word_count": 72,
+    "wpm": 172.8,
+    "filler_count": 1,
+    "confident_words": 0,
+    "silence_ratio": 0.22,
+    "energy": 0.006172,
+    "pitch_variation": 37.0,
+    "duration": 25.0
+  },
+  "expression_metrics": {
+    "avg_smile": 0.381,
+    "smile_variance": 0.00036,
+    "avg_movement": 0.00235,
+    "emotion_stability": 1.0,
+    "eye_contact": 1.0,
+    "blink_rate": 7.2
+  },
+  "nlp_metrics": {
+    "Filler Words": "-",
+    "Keyword Matches": "-",
+    "Sentiment Score": "-",
+    "Clarity Score": "-",
+    "Confidence Score": 95
+  },
+  "transcript": "hello my name is i mean of then and anybody i'm going to tell you about myself so i have studied from there's either school there's a private school in indictment the is also i have done my be tech from medicare university in computer science and engineering i have a specialization engender deviate a and machine learning much i love by the way because they are very good and a i'm",
+  "feedback": "The answer is highly disorganized, filled with filler words, and lacks coherence. It fails to address the question meaningfully and contains numerous grammatical errors.",
+  "nlp_feedback": "The answer is highly disorganized, filled with filler words, and lacks coherence. It fails to address the question meaningfully and contains numerous grammatical errors."
+}
