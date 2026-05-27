@@ -113,11 +113,12 @@ function TopicSelector({ topic, setTopic }) {
         className="app-input"
         value={topic}
         onFocus={() => setOpen(true)}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
         onChange={(e) => {
           setTopic(e.target.value);
           setOpen(true);
         }}
-        placeholder="Type or search interview topic..."
+        placeholder="Type or pick an interview topic..."
       />
       {open && filtered.length > 0 && (
         <div className="topic-dropdown">
@@ -126,7 +127,7 @@ function TopicSelector({ topic, setTopic }) {
               key={item}
               type="button"
               className="topic-option"
-              onClick={() => {
+              onMouseDown={() => {
                 setTopic(item);
                 setOpen(false);
               }}
@@ -146,12 +147,12 @@ function ScoreRing({ score }) {
     <div
       className={`score-ring ${scoreColor(score)}`}
       style={{
-        background: `conic-gradient(var(--ring) ${angle}deg, rgba(255,255,255,0.08) ${angle}deg)`,
+        background: `conic-gradient(var(--ring) ${angle}deg, rgba(255,255,255,0.06) ${angle}deg)`,
       }}
     >
       <div className="score-ring-inner">
         <div className="score-ring-value">{score ?? 0}</div>
-        <div className="score-ring-total">/100</div>
+        <div className="score-ring-total">/ 100</div>
       </div>
     </div>
   );
@@ -280,38 +281,45 @@ export default function App() {
   return (
     <div className="app-shell">
       <main className="app-container">
+        {/* ============ HERO ============ */}
         <section className="hero-card">
           <div className="hero-copy">
-            <span className="eyebrow">AI-powered mock interview workspace</span>
-            <h1>AI Interview Analyzer</h1>
+            <span className="eyebrow">/ AI-powered interview workspace</span>
+            <h1>
+              Practice the interview.{" "}
+              <em style={{ color: "var(--primary)", fontStyle: "italic" }}>
+                Read the room.
+              </em>
+            </h1>
             <p>
-              Practice smarter with live tracking, transcript review, module-wise
-              scoring, and clear improvement guidance after every attempt.
+              An AI second opinion on every answer — your voice, your expressions,
+              your words — scored in real time so you walk into the real thing already warmed up.
             </p>
           </div>
 
           <div className="hero-badge">
-            <span>Interview mode</span>
+            <span>● Active topic</span>
             <strong>{topic.trim() || DEFAULT_TOPIC}</strong>
           </div>
         </section>
 
+        {/* ============ SETUP ============ */}
         {!isRunning && !isDone && (
           <section className="setup-grid">
             <div className="panel panel-lg">
-              <div className="panel-head center">
+              <div className="panel-head">
                 <h2>Interview setup</h2>
-                <p>Choose your topic and session length before starting.</p>
+                <p>Pick your topic and session length, then start recording.</p>
               </div>
 
               <div className="form-stack">
                 <div className="field-block">
-                  <label className="field-label">Interview topic</label>
+                  <label className="field-label">/ Interview topic</label>
                   <TopicSelector topic={topic} setTopic={setTopic} />
                 </div>
 
                 <div className="field-block">
-                  <label className="field-label">Duration</label>
+                  <label className="field-label">/ Duration</label>
                   <div className="duration-row">
                     {["15", "25", "35", "45"].map((item) => (
                       <button
@@ -327,7 +335,7 @@ export default function App() {
                 </div>
 
                 <button type="button" className="primary-btn" onClick={startSession}>
-                  Start Interview
+                  Start interview →
                 </button>
 
                 {error && <div className="error-box">{error}</div>}
@@ -335,33 +343,50 @@ export default function App() {
             </div>
 
             <div className="panel panel-lg">
-              <div className="panel-head center">
-                <h2>What you’ll get</h2>
-                <p>Real interview-style analysis from multiple evaluation modules.</p>
+              <div className="panel-head">
+                <h2>What you'll get</h2>
+                <p>Real interview-style analysis from three independent modules.</p>
               </div>
 
               <div className="feature-list">
                 <div className="feature-card">
-                  <div className="feature-icon">🎙</div>
+                  <div className="feature-icon">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6">
+                      <rect x="7" y="3" width="6" height="10" rx="3" />
+                      <path d="M4 10a6 6 0 0 0 12 0M10 16v3" strokeLinecap="round" />
+                    </svg>
+                  </div>
                   <div>
                     <strong>Audio analysis</strong>
-                    <p>Speech pace, filler-word control, and fluency markers.</p>
+                    <p>Speech pace, filler-word density, and fluency markers.</p>
                   </div>
                 </div>
 
                 <div className="feature-card">
-                  <div className="feature-icon">📷</div>
+                  <div className="feature-icon">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6">
+                      <circle cx="10" cy="10" r="7" />
+                      <circle cx="7.5" cy="8.5" r="0.8" fill="currentColor" />
+                      <circle cx="12.5" cy="8.5" r="0.8" fill="currentColor" />
+                      <path d="M7.5 12.5c1 1 4 1 5 0" strokeLinecap="round" />
+                    </svg>
+                  </div>
                   <div>
                     <strong>Expression analysis</strong>
-                    <p>Confidence, presence, and eye-contact related feedback.</p>
+                    <p>Confidence, on-camera presence, and eye-contact cues.</p>
                   </div>
                 </div>
 
                 <div className="feature-card">
-                  <div className="feature-icon">🧠</div>
+                  <div className="feature-icon">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6">
+                      <path d="M4 5h12M4 10h12M4 15h8" strokeLinecap="round" />
+                      <circle cx="15" cy="15" r="1.5" fill="currentColor" />
+                    </svg>
+                  </div>
                   <div>
                     <strong>NLP analysis</strong>
-                    <p>Clarity, coherence, and answer quality evaluation.</p>
+                    <p>Structure, coherence, and semantic answer quality.</p>
                   </div>
                 </div>
               </div>
@@ -369,22 +394,23 @@ export default function App() {
           </section>
         )}
 
+        {/* ============ LIVE ============ */}
         {isRunning && (
           <section className="live-layout">
             <div className="panel live-panel">
               <div className="live-status">
                 <div className="live-dot"></div>
-                <span>Interview in progress</span>
+                <span>Recording</span>
               </div>
 
-              <h2>Analyzing your interview session</h2>
+              <h2>Reading your answer in real time</h2>
               <p className="muted">
-                Please speak naturally. Audio, expressions, and language quality are being processed.
+                Speak naturally — audio, expression, and language quality are being processed simultaneously.
               </p>
 
               <div className="progress-block">
                 <div className="progress-meta">
-                  <span>Progress</span>
+                  <span>/ Progress</span>
                   <strong>{progress}%</strong>
                 </div>
                 <div className="progress-track">
@@ -403,13 +429,14 @@ export default function App() {
                 </div>
                 <div className="mini-card">
                   <span>Status</span>
-                  <strong>Running</strong>
+                  <strong style={{ color: "var(--primary)" }}>Running</strong>
                 </div>
               </div>
             </div>
           </section>
         )}
 
+        {/* ============ RESULTS ============ */}
         {isDone && (
           <section className="results-layout">
             <div className="results-top">
@@ -426,7 +453,7 @@ export default function App() {
                 </div>
 
                 <div className="feedback-box">
-                  <span>AI feedback</span>
+                  <span>/ AI feedback</span>
                   <p>{session?.nlp_feedback || session?.feedback || "Feedback not available."}</p>
                 </div>
               </div>
@@ -434,26 +461,26 @@ export default function App() {
               <div className="panel action-panel">
                 <div className="panel-head">
                   <h3>Next attempt</h3>
-                  <p>Use this review to improve before trying again.</p>
+                  <p>Use this review to iterate before trying again. Most improvement happens in run 2 and 3.</p>
                 </div>
 
                 <button className="primary-btn" type="button" onClick={resetApp}>
-                  Start New Interview
+                  Run it back →
                 </button>
               </div>
             </div>
 
             <div className="score-grid">
-              <ScoreCard title="Audio Score" value={session.audio_score} />
-              <ScoreCard title="Expression Score" value={session.expression_score} />
-              <ScoreCard title="NLP Score" value={session.nlp_score} />
+              <ScoreCard title="Audio" value={session.audio_score} />
+              <ScoreCard title="Expression" value={session.expression_score} />
+              <ScoreCard title="NLP" value={session.nlp_score} />
             </div>
 
             <div className="insight-grid">
               <div className="panel">
                 <div className="panel-head">
-                  <h3>Where you should improve</h3>
-                  <p>Focus on the lowest-impact areas first for faster gains.</p>
+                  <h3>Where to improve</h3>
+                  <p>Focus on the lowest-scoring area first for fastest gains.</p>
                 </div>
 
                 <div className="improvement-list">
@@ -469,7 +496,7 @@ export default function App() {
               <div className="panel">
                 <div className="panel-head">
                   <h3>Actionable tips</h3>
-                  <p>These are the easiest fixes you can apply in your next answer.</p>
+                  <p>Easy fixes you can apply in your next answer.</p>
                 </div>
 
                 <ul className="tips-list">
@@ -489,7 +516,7 @@ export default function App() {
             <div className="panel transcript-panel">
               <div className="panel-head">
                 <h3>Transcript</h3>
-                <p>Review exactly what the system captured during your answer.</p>
+                <p>What the system actually captured during your answer.</p>
               </div>
 
               <div className="transcript-box">
