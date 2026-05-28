@@ -124,7 +124,7 @@ def _run_session(session_id: str, duration: int, topic: str):
 
     # ── NLP Phase (Mistral integrated) ───────────────────────
     try:
-        nlp_score, nlp_metrics, nlp_feedback = run_nlp_analysis(transcript)
+        nlp_score, nlp_metrics, nlp_feedback = run_nlp_analysis(transcript, topic=topic)
     except Exception as e:
         sess["error"] = f"NLP error: {e}"
 

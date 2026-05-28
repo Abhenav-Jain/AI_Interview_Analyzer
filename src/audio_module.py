@@ -14,7 +14,7 @@ from vosk import Model, KaldiRecognizer
 # ── Path setup ───────────────────────────────────────────────
 BASE_DIR   = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 AUDIO_PATH = os.path.join(BASE_DIR, "data", "audio", "interview.wav")
-MODEL_PATH = os.path.join(BASE_DIR, "models", "vosk-model-small-en-us-0.15")
+MODEL_PATH = os.path.join(BASE_DIR, "models", "vosk-model-en-in-0.5")   # ← Indian English model
 
 os.makedirs(os.path.dirname(AUDIO_PATH), exist_ok=True)
 
@@ -105,6 +105,10 @@ def run_audio_analysis(duration: int = 25):
     if y.ndim > 1:
         y = y.mean(axis=1)
 
+    # Convert int16 PCM to float32 for librosa
+    if y.dtype == np.int16:
+        y = y.astype(np.float32) / 32768.0
+
     actual_duration = len(y) / sr
 
     words = transcript.split()
@@ -121,7 +125,7 @@ def run_audio_analysis(duration: int = 25):
         f0 = librosa.yin(y, fmin=80, fmax=300, sr=sr)
         f0_clean = f0[~np.isnan(f0)]
         pitch_var = float(np.std(f0_clean)) if len(f0_clean) else 0
-    except:
+    except Exception:
         pitch_var = 0
 
     # ── SCORING ───────────────────────────────────────────────
@@ -158,15 +162,20 @@ def run_audio_analysis(duration: int = 25):
 
     score = int(max(0, min(100, score)))
 
+    # ── Confidence score (NEW) ────────────────────────────────
+    # Audio confidence = derived from overall delivery quality
+    audio_confidence = int(min(100, max(0, score)))
+
     metrics = {
-        "word_count": word_count,
-        "wpm": round(wpm, 1),
-        "filler_count": filler_count,
+        "word_count":      word_count,
+        "wpm":             round(wpm, 1),
+        "filler_count":    filler_count,
         "confident_words": confident_count,
-        "silence_ratio": round(silence, 2),
-        "energy": round(energy, 6),
+        "silence_ratio":   round(silence, 2),
+        "energy":          round(energy, 6),
         "pitch_variation": round(pitch_var, 1),
-        "duration": round(actual_duration, 1),
+        "duration":        round(actual_duration, 1),
+        "confidence_score": audio_confidence,
     }
 
     print(f"\n🎯 Audio Score: {score}/100")

@@ -6,6 +6,7 @@ Changes:
 - Eye contact detection added via MediaPipe iris landmarks
 - Blink detection added
 - Better score logic with eye contact as factor
+- Added confidence_score metric (blend of eye contact + emotion stability)
 """
 
 import cv2
@@ -38,12 +39,13 @@ def run_expression_analysis(duration: int = 30):
     if not cap.isOpened():
         print("❌ Camera not accessible")
         return 0, {
-        "avg_smile": 0,
-        "smile_variance": 0,
-        "avg_movement": 0,
-        "emotion_stability": 0,
-        "eye_contact": 0,
-        "blink_rate": 0,
+            "avg_smile": 0,
+            "smile_variance": 0,
+            "avg_movement": 0,
+            "emotion_stability": 0,
+            "eye_contact": 0,
+            "blink_rate": 0,
+            "confidence_score": 0,
         }
 
     # ── Buffers ───────────────────────────────────────────────────────────────
@@ -166,7 +168,6 @@ def run_expression_analysis(duration: int = 30):
                     emotion_list.append(emotion)
                 except Exception:
                     pass
-                  
 
         if SHOW_WINDOW:
             cv2.imshow("AI Interview Analyzer", frame)
@@ -230,7 +231,7 @@ def run_expression_analysis(duration: int = 30):
     # 4. Emotion stability — max 18pts
     score += int(emotion_stability * 18)
 
-    # 5. Eye contact — max 15pts (NEW)
+    # 5. Eye contact — max 15pts
     if eye_contact_ratio >= 0.7:
         score += 15
     elif eye_contact_ratio >= 0.5:
@@ -240,7 +241,7 @@ def run_expression_analysis(duration: int = 30):
     else:
         score += 0
 
-    # 6. Blink rate (10-25/min is natural) — max 10pts (NEW)
+    # 6. Blink rate (10-25/min is natural) — max 10pts
     if 10 <= blink_rate <= 25:
         score += 10
     elif 6 <= blink_rate < 10 or 25 < blink_rate <= 35:
@@ -250,6 +251,10 @@ def run_expression_analysis(duration: int = 30):
 
     score = max(0, min(100, score))
 
+    # ── Confidence Score (NEW) ────────────────────────────────────────────────
+    # Blend of eye contact (50%) + emotion stability (50%), both already 0-1
+    expression_confidence = int((eye_contact_ratio * 50) + (emotion_stability * 50))
+
     metrics = {
         "avg_smile":         round(avg_smile,         3),
         "smile_variance":    round(smile_var,          5),
@@ -257,6 +262,7 @@ def run_expression_analysis(duration: int = 30):
         "emotion_stability": round(emotion_stability,  3),
         "eye_contact":       round(eye_contact_ratio,  2),
         "blink_rate":        round(blink_rate,         1),
+        "confidence_score":  expression_confidence,
     }
 
     print(f"\n📷 Expression Score: {score}/100")
