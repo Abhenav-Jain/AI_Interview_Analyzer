@@ -1,401 +1,127 @@
 # AI Interview Analyzer
 
-> A multimodal AI system that evaluates mock interview answers in real time across **speech**, **facial expression**, and **language** dimensions — and gives you a weighted composite score with specific, actionable feedback.
+Practice an interview answer in your browser and get a scored report on three things: **how you sound**, **how you come across on camera**, and **how good the answer is**. Every score shows the measurement and the reason behind it, plus a ranked list of fixes with the points each one could earn.
 
-<p align="center">
-  <img src="docs/screenshots/01-landing.png" alt="AI Interview Analyzer — landing screen" width="100%" />
-</p>
+- Runs in the browser (mic + camera captured client-side, so it works when deployed).
+- Speech is transcribed locally with `faster-whisper` while you are still talking, so the report appears seconds after you stop.
+- Answer quality is graded against a five-criteria rubric by any OpenAI-compatible LLM (Mistral by default), with a safe rule-based fallback.
+- Your video never leaves your device. Audio is analysed in memory and never written to disk.
 
-<p align="center">
-  <a href="#-features">Features</a> ·
-  <a href="#-tech-stack">Tech Stack</a> ·
-  <a href="#-getting-started">Getting Started</a> ·
-  <a href="#-how-it-works">How It Works</a> ·
-  <a href="#-project-structure">Project Structure</a> ·
-  <a href="#-api-reference">API</a>
-</p>
+## Quick start
 
----
+### Docker (recommended)
 
-## ✨ Features
+```bash
+cp .env.example .env        # add LLM_API_KEY (optional but recommended)
+docker compose up --build   # first build downloads the speech model (~500 MB)
+```
 
-- **🔊 Audio analysis** — Offline speech-to-text via Vosk (Indian English model), pace (WPM), filler-word density, pitch variation, silence ratio, energy
-- **📷 Expression analysis** — Real-time facial landmark tracking (OpenCV + MediaPipe) for smile detection, eye contact, emotion stability, blink rate, and head movement
-- **🧠 Hybrid NLP** — Local metrics (filler count, keyword matches, sentiment, clarity) combined with Mistral LLM for semantic scoring and feedback
-- **⚡ Parallel processing** — Audio and expression modules run in parallel threads; NLP runs after transcript is ready
-- **📊 Detailed report** — Per-module breakdown, improvement areas, actionable tips, and full transcript saved as JSON
-- **🎨 Editorial UI** — Custom dark interface with monospace data typography — no template look
+Open http://localhost:8000. Camera and microphone need **HTTPS or localhost**.
 
----
+### Local development
 
-## 📸 Screenshots
+```bash
+./scripts/dev.sh            # backend :8000 (reload) + frontend :5173
+# or manually:
+cd backend  && pip install -r requirements.txt && uvicorn app.main:get_app --factory --reload
+cd frontend && npm install && npm run dev
+```
 
-### Setup
-Pick a topic, choose duration, and start the session.
+`npm install` copies MediaPipe's WASM and downloads the 4 MB face model into `frontend/public/mediapipe/`. If you are offline, download it manually (the script prints the command). Without it the app still works and simply skips expression analysis.
 
-<p align="center">
-  <img src="docs/screenshots/01-landing.png" alt="Setup screen" width="100%" />
-</p>
+Analyse a recording without the UI:
 
-### Live recording
-Audio, expression, and NLP modules execute in parallel while you speak.
+```bash
+cd backend && python -m app.cli answer.wav --topic "Tell me about yourself"
+```
 
-<p align="center">
-  <img src="docs/screenshots/02-live.png" alt="Live recording screen" width="100%" />
-</p>
+## How it works
 
-### Results — overall
-Composite score, AI-generated feedback, and per-module breakdown.
+```mermaid
+flowchart LR
+  subgraph Browser
+    M[Mic] --> W[AudioWorklet<br/>16 kHz PCM]
+    C[Camera] --> F[MediaPipe Face Landmarker<br/>smile, blink, head pose, gaze]
+  end
+  W -- binary frames --> WS((WebSocket))
+  F -- ~10 small samples/s --> WS
+  subgraph Server["FastAPI (one container)"]
+    WS --> R[Rolling transcriber<br/>faster-whisper, cuts at pauses]
+    WS --> A[Audio features<br/>pauses, pitch, loudness, SNR]
+    WS --> FA[Face aggregation<br/>calibrated eye contact, blinks]
+    R --> T[Text metrics] --> L[LLM rubric<br/>validated JSON, cached]
+    A & FA & T & L --> S[Scoring engine] --> DB[(SQLite)]
+  end
+  S -- partial text, stages, result --> WS
+```
 
-<p align="center">
-  <img src="docs/screenshots/03-results-top.png" alt="Results — overall score" width="100%" />
-</p>
+Why it is fast: while you speak, finished stretches of audio (cut at natural pauses) are transcribed in the background. When you press Finish only the last few seconds remain, and the audio analysis runs in parallel with that. Typical wait after stopping is the last transcription chunk plus one LLM call.
 
-### Results — improvements
-Where to focus next and which fixes give the fastest gains.
+## Scoring (all weights are configurable)
 
-<p align="center">
-  <img src="docs/screenshots/04-results-scores.png" alt="Results — improvements and tips" width="100%" />
-</p>
-
-### Results — metrics & transcript
-Raw module metrics across audio, expression, and NLP.
-
-<p align="center">
-  <img src="docs/screenshots/05-results-metrics.png" alt="Results — metrics and transcript" width="100%" />
-</p>
-
----
-
-## 🛠 Tech Stack
-
-### Backend (Python)
-| Layer | Tech | Why |
+| Module | Weight | Components (points) |
 |---|---|---|
-| API | **FastAPI** | Async, type-safe, auto-generated docs |
-| Server | **Uvicorn** | ASGI server with hot reload |
-| Concurrency | **Python threading + BackgroundTasks** | Parallel module execution |
-| Speech-to-text | **Vosk (en-in-0.5)** | Offline, ~1 GB, optimized for Indian English |
-| Audio features | **librosa, soundfile, sounddevice** | WPM, pitch, energy, silence detection |
-| Face analysis | **OpenCV + MediaPipe** | Facial landmarks, gaze, emotion stability |
-| LLM | **Mistral AI** | Semantic scoring and feedback |
-| Config | **python-dotenv** | API key management |
+| Voice | 35% | pace on *speaking time* (25), fluency: fillers + long pauses (30), vocal variety in semitones (15), volume & noise (15), rhythm (15) |
+| Presence | 20% | eye contact vs. your own calibration (40), presence in frame (15), head movement (20), blink-rate composure (15), warmth (10) |
+| Answer quality | 45% | LLM rubric: relevance 30%, structure 20%, specificity 20%, depth 15%, clarity 15%. The model grades; the code computes the score. Very short answers are capped. |
 
-### Frontend
-| Layer | Tech |
+- A module without data (camera denied, no LLM) is **excluded and the weights are re-normalised**, never scored as zero.
+- Each report carries a confidence level (speech-recognition certainty, answer length, calibration, noise) and says why.
+- Silence returns "we couldn't hear you", not a fake score.
+
+## Configuration
+
+See [`.env.example`](.env.example). The ones that matter most:
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `LLM_API_KEY` / `LLM_BASE_URL` / `LLM_MODEL` | – / Mistral / `mistral-small-latest` | Rubric evaluation. Any OpenAI-compatible endpoint works. `MISTRAL_API_KEY` still accepted. |
+| `WHISPER_MODEL` | `small.en` | `base.en` faster, `medium.en` / `distil-large-v3` more accurate (more RAM/CPU). |
+| `MAX_ACTIVE_SESSIONS` | 3 | Concurrent live interviews per container. |
+| `RETENTION_DAYS` | 30 | Auto-delete old reports. |
+| `STORE_TRANSCRIPTS` | true | `false` stores scores only. |
+| `API_KEY` | unset | Require `X-API-Key` to create sessions (private deployments). |
+| `APP_ENV` | development | `production` enforces WebSocket origin checks. |
+
+## API
+
+| Endpoint | Description |
 |---|---|
-| Framework | **React 18** |
-| Build tool | **Vite** |
-| Styling | **Plain CSS** (custom design system, no UI kit) |
-| Fonts | **Instrument Serif** + **Inter Tight** + **JetBrains Mono** (via Google Fonts) |
+| `POST /api/sessions` `{topic, duration}` | Returns `session_id` and a secret `token`. Rate-limited per IP. |
+| `WS /api/ws/sessions/{id}?token=` | Client sends `calibration`, `start`, binary PCM16 frames, `face`, `end`. Server sends `ready`, `partial`, `stage`, `result`, `error`. |
+| `GET /api/sessions/{id}` | Status/result. Header `X-Session-Token`. |
+| `DELETE /api/sessions/{id}` | Erases the report. |
+| `GET /api/health`, `/api/ready`, `/api/config` | Liveness, readiness (model loaded), public settings. Interactive docs at `/docs`. |
 
-### Architecture
-- Decoupled frontend (`localhost:5173`) ↔ backend (`localhost:8000`) with CORS-enabled REST API
-- Session-based polling (1s interval) for live progress updates
-- Background workers via FastAPI `BackgroundTasks` — non-blocking
-- JSON-based session reports persisted to `/reports/<session_id>.json`
+There is intentionally no endpoint that lists sessions; history is kept in the user's browser.
 
----
+## Deployment notes
 
-## 🚀 Getting Started
+- One uvicorn worker per container (the speech model is large and live sessions are bound to a process). Scale by adding containers; use at least 2 vCPU / 3 GB RAM for `small.en`.
+- Terminate TLS at your proxy/PaaS (Render, Railway, Fly.io, ECS, a VPS with Caddy/nginx) and set `TRUST_PROXY=true`. Browsers refuse camera/mic on plain HTTP.
+- Persist `/data` (SQLite) if you want reports to survive redeploys.
+- The image bakes in the speech model; set `HF_HUB_OFFLINE=1` if your host has no outbound access.
 
-### Prerequisites
-
-- **Python 3.10+**
-- **Node.js 18+** and **npm**
-- A working webcam and microphone
-- ~1 GB free disk space (for Vosk model)
-- Optional: **Mistral API key** (the app falls back to local-only scoring without it)
-
-### 1. Clone the repository
+## Tests
 
 ```bash
-git clone https://github.com/Abhenav-Jain/AI_Interview_Analyzer.git
-cd AI_Interview_Analyzer
+cd backend && pip install -r requirements-dev.txt && pytest      # 30 tests: DSP, scoring, LLM client, streaming STT, full WebSocket flow
+cd frontend && npm run lint && npm run build
 ```
 
-### 2. Download the Vosk Indian English model
+CI (`.github/workflows/ci.yml`) runs lint, tests, build and the Docker build.
 
-The speech-to-text model is too large to bundle in the repo. Download and extract it manually:
+## Honest limitations
 
-```powershell
-# Windows PowerShell
-mkdir models -Force
-Invoke-WebRequest -Uri "https://alphacephei.com/vosk/models/vosk-model-en-in-0.5.zip" -OutFile "models/vosk-model.zip"
-Expand-Archive -Path "models/vosk-model.zip" -DestinationPath "models/" -Force
-Remove-Item "models/vosk-model.zip"
-```
+- Whisper tends to clean up "um/uh". The prompt is primed to keep them, and long-pause detection backs up the fluency score, but filler counts can still be low.
+- Face metrics are indicative, not clinical. They depend on lighting and camera angle, which is why calibration exists. Do not use these scores for real hiring decisions.
+- Scores are a practice aid. The LLM rubric is calibrated by prompt, not validated against human raters yet.
+- SQLite and in-memory limits suit a single container; for multi-instance scale move sessions to Postgres/Redis.
 
-```bash
-# macOS / Linux
-mkdir -p models
-curl -L https://alphacephei.com/vosk/models/vosk-model-en-in-0.5.zip -o models/vosk-model.zip
-unzip models/vosk-model.zip -d models/
-rm models/vosk-model.zip
-```
+## Roadmap
 
-Verify: `models/vosk-model-en-in-0.5/` should now exist with subfolders `am/`, `conf/`, `graph/`, etc.
+Question bank by role, multi-question mock interviews, optional GPU build, per-language models, human-rater calibration study.
 
-### 3. Backend setup
+## License
 
-```bash
-cd backend
-python -m venv venv
-
-# Windows
-.\venv\Scripts\Activate.ps1
-# macOS / Linux
-source venv/bin/activate
-
-pip install -r requirements.txt
-```
-
-**Set up your Mistral API key** (optional but recommended). Create a `.env` file inside `backend/`:
-
-```env
-MISTRAL_API_KEY=your_api_key_here
-```
-
-Get a free key from [console.mistral.ai](https://console.mistral.ai/).
-
-**Run the backend:**
-
-```bash
-python main_api.py
-```
-
-The API starts at **http://localhost:8000**. Verify with:
-```
-{"message": "AI Interview Analyzer API running 🚀"}
-```
-
-Swagger docs available at **http://localhost:8000/docs**.
-
-### 4. Frontend setup
-
-Open a **new terminal**:
-
-```bash
-cd frontend/frontend
-npm install
-npm run dev
-```
-
-Visit **http://localhost:5173** — the app should load with both backend and frontend connected.
-
----
-
-## 🧠 How It Works
-
-```
-┌─────────────────────────┐
-│  User clicks "Start"    │
-└────────────┬────────────┘
-             │  POST /session/start
-             ▼
-┌─────────────────────────────────────────────┐
-│  FastAPI creates session, returns UUID      │
-│  Spawns background worker thread             │
-└────────────┬────────────────────────────────┘
-             │
-             ▼
-┌─────────────────────────────────────────────┐
-│  Two parallel threads launched              │
-├──────────────────────┬──────────────────────┤
-│  🔊 Audio thread     │  📷 Expression thread│
-│  • Mic capture       │  • Webcam capture    │
-│  • Vosk transcribe   │  • MediaPipe analyze │
-│  • librosa features  │  • Per-frame metrics │
-│  • Score (0-100)     │  • Score (0-100)     │
-└──────────────────────┴──────────────────────┘
-             │  Both threads join
-             ▼
-┌─────────────────────────┐
-│  🧠 NLP analysis        │
-│  • Local metrics        │
-│    (regex, sentiment,   │
-│     clarity heuristics) │
-│  • Mistral API for      │
-│    semantic score +     │
-│    feedback             │
-└────────────┬────────────┘
-             │
-             ▼
-┌─────────────────────────────────────────┐
-│  Weighted composite score                │
-│  final = 0.35·audio + 0.35·expression    │
-│        + 0.30·nlp                        │
-└────────────┬─────────────────────────────┘
-             │
-             ▼
-┌─────────────────────────┐
-│  Session saved to       │
-│  /reports/<uuid>.json   │
-│  Frontend polls until   │
-│  status: "done"         │
-└─────────────────────────┘
-```
-
-**Design decisions worth noting:**
-
-- **Audio & expression in parallel** — both capture real-time data for the full session duration. Running them sequentially would double the wait time.
-- **NLP runs after audio** — it depends on the transcript, so it's a sequential dependency.
-- **Hybrid NLP scoring** — local rule-based metrics are deterministic, free, and fast; the LLM is reserved for things rules can't measure (semantic depth, contextual quality).
-- **Polling over WebSocket** — simpler implementation for 1s update frequency. WebSocket would be a clean upgrade for finer-grained live updates.
-
----
-
-## 📁 Project Structure
-
-```
-AI_Interview_Analyzer/
-├── backend/
-│   ├── main_api.py           # FastAPI app — routes, session lifecycle
-│   ├── requirements.txt
-│   └── venv/                 # virtual env (gitignored)
-├── src/                      # Analysis modules
-│   ├── audio_module.py       # Mic recording + Vosk STT + librosa scoring
-│   ├── expression_module.py  # OpenCV + MediaPipe face analysis
-│   ├── nlp_analysis.py       # Local metrics + Mistral integration
-│   └── main.py               # Standalone CLI runner (no API)
-├── frontend/
-│   └── frontend/             # Vite + React app
-│       ├── src/
-│       │   ├── App.jsx       # Main UI — setup, live, results states
-│       │   ├── App.css       # Design system + component styles
-│       │   ├── index.css     # Global resets, font loading
-│       │   └── main.jsx
-│       ├── package.json
-│       └── vite.config.js
-├── models/
-│   └── vosk-model-en-in-0.5/ # Speech recognition model (downloaded separately)
-├── data/
-│   └── audio/                # Recorded audio (interview.wav) — gitignored
-├── reports/                  # Saved session reports as JSON
-├── docs/
-│   └── screenshots/          # README images
-├── .env                      # API keys (gitignored)
-├── .gitignore
-└── README.md
-```
-
----
-
-## 🔌 API Reference
-
-Full interactive docs available at **http://localhost:8000/docs** (Swagger UI).
-
-| Endpoint | Method | Description |
-|---|---|---|
-| `/` | GET | Health check |
-| `/health` | GET | Status + active session count |
-| `/session/start` | POST | Start a new interview session |
-| `/session/{id}` | GET | Poll session status / fetch results |
-| `/session/{id}` | DELETE | Remove a session and its report |
-| `/sessions` | GET | List all completed sessions |
-
-### Example: start a session
-
-```bash
-curl -X POST http://localhost:8000/session/start \
-  -H "Content-Type: application/json" \
-  -d '{"duration": 25, "topic": "Tell me about yourself"}'
-```
-
-Response:
-```json
-{ "session_id": "a1b2c3d4-..." }
-```
-
-### Example: poll status
-
-```bash
-curl http://localhost:8000/session/a1b2c3d4-...
-```
-
-Response while running:
-```json
-{
-  "session_id": "a1b2c3d4-...",
-  "status": "running",
-  "progress": 45
-}
-```
-
-Response when done:
-```json
-{
-  "session_id": "a1b2c3d4-...",
-  "status": "done",
-  "progress": 100,
-  "final_score": 72,
-  "audio_score": 78,
-  "expression_score": 65,
-  "nlp_score": 74,
-  "audio_metrics": { "wpm": 142.3, "filler_count": 3, "...": "..." },
-  "expression_metrics": { "eye_contact": 0.99, "avg_smile": 0.4, "...": "..." },
-  "nlp_metrics": { "Filler Words": 3, "Sentiment Score": 65, "...": "..." },
-  "transcript": "I worked on a project where I...",
-  "feedback": "Strong answer with clear structure. Reduce filler words..."
-}
-```
-
----
-
-## ⚙️ Configuration
-
-Composite score weights live in `backend/main_api.py`:
-
-```python
-W_AUDIO      = 0.35   # 35% — voice delivery quality
-W_EXPRESSION = 0.35   # 35% — non-verbal presence
-W_NLP        = 0.30   # 30% — content quality
-DURATION     = 25     # default seconds per session
-```
-
-Adjust to bias scoring toward whichever signal matters most for your use case. Currently hand-tuned — a learnable weighting trained on a labeled interview dataset is a planned improvement.
-
----
-
-## 🗺 Roadmap
-
-- [ ] Replace polling with WebSocket for lower-latency live updates
-- [ ] Browser-side audio/video recording (currently backend uses local mic/camera)
-- [ ] Per-question session mode (multi-question interviews)
-- [ ] Role-specific question banks (frontend, PM, ML, consulting, etc.)
-- [ ] Learnable weights from a labeled dataset instead of hand-tuned
-- [ ] Persistent user profiles + progress tracking over time
-- [ ] Side-by-side answer replay with module-level overlays
-- [ ] Docker containerization for easier deployment
-- [ ] Unit + integration tests (pytest + Jest)
-
----
-
-## 🤝 Contributing
-
-Pull requests are welcome. For major changes, please open an issue first to discuss what you'd like to change.
-
-```bash
-git checkout -b feature/your-feature
-# make changes
-git commit -m "feat: add your feature"
-git push origin feature/your-feature
-```
-
----
-
-## 📄 License
-
-MIT © [Abhenav Jain](https://github.com/Abhenav-Jain)
-
-See [LICENSE](LICENSE) for details.
-
----
-
-## 🙏 Acknowledgments
-
-- **[Vosk](https://alphacephei.com/vosk/)** — offline speech recognition
-- **[MediaPipe](https://google.github.io/mediapipe/)** — facial landmark detection
-- **[Mistral AI](https://mistral.ai/)** — LLM-powered semantic feedback
-- **[FastAPI](https://fastapi.tiangolo.com/)** & **[React](https://react.dev/)** — the backbone
-- **[librosa](https://librosa.org/)** — audio feature extraction
+MIT, see [LICENSE](LICENSE). Large model files and old reports from v1: see [scripts/purge-git-history.md](scripts/purge-git-history.md).

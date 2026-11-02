@@ -1,0 +1,9 @@
+.git
+.venv
+**/node_modules
+frontend/dist
+frontend/public/mediapipe/face_landmarker.task
+backend/tests
+data
+**/__pycache__
+.env

@@ -1,0 +1,21 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        WHISPER_MODEL: ${WHISPER_MODEL:-small.en}
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      TRUST_PROXY: "false"
+    volumes:
+      - analyzer-data:/data
+    restart: unless-stopped
+    # CPU: ~1.5-2 GB RAM for small.en. Raise for medium.en / more concurrent sessions.
+    mem_limit: 3g
+
+volumes:
+  analyzer-data:
